@@ -52,5 +52,57 @@ export const mockRecruitPosts: PostType[] = [
     thumbnail_url: "/images/match1.jpg",
     description: "중급 팀과 친선 경기 원합니다. 풋살 가능.",
     created_at: "2025-04-16T14:00:00Z"
+  },
+  {
+    id: 4,
+    category: "mercenary",
+    target_type: "team",
+    title: "공격수 포지션으로 경기 구해요!",
+    region: "서울 강동구",
+    date: "2025-04-23",
+    time: "20:00",
+    status: "open",
+    thumbnail_url: "/images/user2.jpg",
+    description: "빠르고 위치 선정이 뛰어난 공격수입니다. 강남 지역 선호.",
+    created_at: "2025-04-17T14:00:00Z"
+  },
+  {
+    id: 5,
+    category: "mercenary",
+    target_type: "team",
+    title: "주중 야간 경기 참여 원합니다",
+    region: "인천 남동구",
+    date: "2025-04-24",
+    time: "21:00",
+    status: "open",
+    thumbnail_url: "/images/user3.jpg",
+    description: "회사원이라 평일 밤 시간 가능합니다. 수비, 미드필더 포지션 가능.",
+    created_at: "2025-04-17T15:30:00Z"
+  },
+  {
+    id: 6,
+    category: "mercenary",
+    target_type: "user",
+    title: "강서구 팀원 모집합니다",
+    region: "서울 강서구",
+    date: "2025-04-27",
+    time: "18:00",
+    status: "open",
+    thumbnail_url: "/images/team2.jpg",
+    description: "주말 저녁 위주로 활동하는 팀입니다. 수비수 모집 중.",
+    created_at: "2025-04-17T16:45:00Z"
+  },
+  {
+    id: 7,
+    category: "mercenary",
+    target_type: "user",
+    title: "강서구 팀원 모집합니다",
+    region: "서울 강남구",
+    date: "2025-04-27",
+    time: "18:00",
+    status: "open",
+    thumbnail_url: "/images/team2.jpg",
+    description: "주말 저녁 위주로 활동하는 팀입니다. 공격수 모집 중.",
+    created_at: "2025-04-17T16:45:00Z"
   }
 ]

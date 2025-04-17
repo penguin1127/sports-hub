@@ -10,8 +10,14 @@ const HomePage = () => {
       </section>
 
       <HomeSectionFilterWrapper title="🔥 용병 모집" category="mercenary" allPosts={mockRecruitPosts} />
-      <HomeSectionFilterWrapper title="🛡️ 팀 모집" category="team" allPosts={mockRecruitPosts} />
-      <HomeSectionFilterWrapper title="🏟️ 경기 모집" category="match" allPosts={mockRecruitPosts} />
+
+  <div className="border-t border-gray-200 mx-4" />
+
+  <HomeSectionFilterWrapper title="🛡️ 팀 모집" category="team" allPosts={mockRecruitPosts} />
+
+  <div className="border-t border-gray-200 mx-4" />
+
+  <HomeSectionFilterWrapper title="🏟️ 경기 모집" category="match" allPosts={mockRecruitPosts} />
     </div>
   )
 }
