@@ -1,8 +1,8 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { BrowserRouter, Routes, Route } from "react-router-dom" 
 import Layout from "@/components/layout/Layout"
 import HomePage from "@/features/home/pages/HomePage"
-import MercenaryPage from "../features/mercenary/pages/MercenaryPage"
-// 필요 시 팀/매치 페이지도 나중에 추가 가능
+import MercenaryPage from "@/features/mercenary/pages/MercenaryPage"
+import TeamManagePage from "@/features/team-manage/pages/TeamManagePage"
 
 const Team = () => <div className="text-xl">👥 Team Page</div>
 const Match = () => <div className="text-xl">⚽ Match Page</div>
@@ -17,6 +17,7 @@ const AppRouter = () => {
           <Route path="/mercenary" element={<MercenaryPage />} />
           <Route path="/team" element={<Team />} />
           <Route path="/match" element={<Match />} />
+          <Route path="/team-manage" element={<TeamManagePage />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
