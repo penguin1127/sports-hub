@@ -1,28 +1,30 @@
 // src/features/team-manage/pages/TeamManagePage.tsx
-import { useNavigate } from "react-router-dom"
+import TeamListItem from "../components/TeamListItem"
 
-const dummyTeams = [
-  { id: 1, name: "FC 강서", region: "서울 강서구" },
-  { id: 2, name: "FC 마포", region: "서울 마포구" },
+const mockTeams = [
+  {
+    id: 1,
+    name: "FC 강서",
+    intro: "주말 리그 참가 중. 공격수 모집 중!",
+    region: "서울 강서구",
+    imageUrl: "/images/team1.jpg"
+  },
+  {
+    id: 2,
+    name: "마포 유나이티드",
+    intro: "화요일 밤 정기 풋살! 수비수 환영",
+    region: "서울 마포구",
+    imageUrl: "/images/team2.jpg"
+  }
 ]
 
 const TeamManagePage = () => {
-  const navigate = useNavigate()
-
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 space-y-4">
-      <h2 className="text-xl font-bold">내 팀</h2>
-      <p className="text-sm text-gray-600">내가 가입한 팀 목록과 팀 경기 일정을 표시합니다.</p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        {dummyTeams.map(team => (
-          <div
-            key={team.id}
-            className="border rounded p-4 hover:shadow cursor-pointer"
-            onClick={() => navigate(`/team-manage/${team.id}`)}
-          >
-            <h3 className="text-lg font-semibold">{team.name}</h3>
-            <p className="text-sm text-gray-500">{team.region}</p>
-          </div>
+    <div className="max-w-3xl mx-auto px-4 py-8 space-y-2">
+      <h2 className="text-xl font-bold mb-4">내 팀 목록</h2>
+      <div className="border rounded divide-y">
+        {mockTeams.map((team) => (
+          <TeamListItem key={team.id} {...team} />
         ))}
       </div>
     </div>
