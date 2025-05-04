@@ -2,15 +2,10 @@ package com.example.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.time.LocalDate;
 
-/**
- * 사용자 정보를 저장하는 엔티티 클래스.
- * - username은 고유하며, 회원가입 시 중복 검사를 위해 사용.
- * - password는 암호화된 비밀번호가 저장됨.
- * - role은 권한 정보를 담음 (예: ROLE_USER, ROLE_ADMIN 등).
- */
 @Entity
-@Table(name = "users") // MySQL 예약어 회피 및 테이블 이름 명시
+@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -22,12 +17,46 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false, length = 50)
-    private String username;
+    @Column(length = 50, nullable = false)
+    private String name;
 
-    @Column(nullable = false)
+    @Column(length = 100, unique = true, nullable = false)
+    private String email;
+
+    @Column(length = 50, unique = true, nullable = false)
+    private String userid;
+
+    @Column(length = 255, nullable = false)
     private String password;
 
-    @Column(nullable = false)
-    private String role;
+    @Lob
+    @Column(name = "joined_teams", columnDefinition = "TEXT")
+    private String joinedTeams;
+
+    @Column(name = "is_ex_player", length = 50)
+    private String isExPlayer;
+
+    @Column(length = 100)
+    private String region;
+
+    @Column(name = "preferred_position", length = 50)
+    private String preferredPosition;
+
+    @Column(name = "is_captain")
+    private Boolean isCaptain;
+
+    @Column(name = "phone_number", length = 20)
+    private String phoneNumber;
+
+    @Column(name = "activity_start_date")
+    private LocalDate activityStartDate;
+
+    @Column(name = "activity_end_date")
+    private LocalDate activityEndDate;
+
+    @Column(name = "birth_date")
+    private LocalDate birthDate;
+
+    @Column(length = 50)
+    private String role; // ex) "ROLE_USER", "ROLE_ADMIN"
 }

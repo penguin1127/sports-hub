@@ -1,3 +1,4 @@
+// com.example.backend.controller.AuthController.java
 package com.example.backend.controller;
 
 import com.example.backend.dto.AuthRequestDTO;
@@ -14,23 +15,14 @@ public class AuthController {
 
     private final AuthService authService;
 
-    /**
-     * 회원가입 API
-     * URL: POST /api/auth/signup
-     * Body: { "username": "testuser", "password": "testpass" }
-     */
+    // 회원가입
     @PostMapping("/signup")
-    public ResponseEntity<Void> signUp(@RequestBody AuthRequestDTO request) {
+    public ResponseEntity<String> signup(@RequestBody AuthRequestDTO request) {
         authService.signUp(request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("회원가입 완료");
     }
 
-    /**
-     * 로그인 API
-     * URL: POST /api/auth/login
-     * Body: { "username": "testuser", "password": "testpass" }
-     * 응답: { "token": "eyJhbGciOi..." }
-     */
+    // 로그인
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@RequestBody AuthRequestDTO request) {
         AuthResponseDTO response = authService.login(request);

@@ -1,11 +1,12 @@
+// com.example.backend.jwt.JwtTokenProvider.java
 package com.example.backend.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.PostConstruct;
 import java.security.Key;
 import java.util.Date;
 
@@ -13,72 +14,67 @@ import java.util.Date;
 public class JwtTokenProvider {
 
     @Value("${jwt.secret}")
-    private String secret;
+    private String secretKey;
 
     @Value("${jwt.expiration}")
-    private long validityInMilliseconds;
+    private long validityInMillis;
 
-    private Key secretKey;
+    private Key key;
 
     @PostConstruct
     protected void init() {
-        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes());
+        this.key = Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 
-    public String generateToken(String username, String role) {
+    /**
+     * JWT 토큰 생성
+     */
+    public String generateToken(String userid, String role) {
+        Claims claims = Jwts.claims().setSubject(userid);
+        claims.put("role", role); // 권한 정보 추가
+
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + validityInMilliseconds);
+        Date expiry = new Date(now.getTime() + validityInMillis);
 
         return Jwts.builder()
-                .setSubject(username)
-                .claim("role", role)
+                .setClaims(claims)
                 .setIssuedAt(now)
-                .setExpiration(expiryDate)
-                .signWith(secretKey, SignatureAlgorithm.HS256)
+                .setExpiration(expiry)
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
+    /**
+     * 토큰에서 사용자 ID 추출
+     */
+    public String getUseridFromToken(String token) {
+        return parseClaims(token).getSubject();
+    }
+
+    /**
+     * 토큰에서 권한(role) 추출
+     */
+    public String getRoleFromToken(String token) {
+        return (String) parseClaims(token).get("role");
+    }
+
+    /**
+     * 토큰 유효성 검사
+     */
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder()
-                    .setSigningKey(secretKey)
-                    .build()
-                    .parseClaimsJws(token);
+            parseClaims(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
-            System.out.println("❌ JWT 검증 실패: " + e.getMessage());
             return false;
         }
     }
 
-    public String getUsernameFromToken(String token) {
+    private Claims parseClaims(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(secretKey)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
-    }
-
-    public String getRoleFromToken(String token) {
-        Claims claims = getAllClaimsFromToken(token);
-        return claims.get("role", String.class);
-    }
-
-    private Claims getAllClaimsFromToken(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(secretKey)
+                .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-    }
-
-    // ✅ 테스트용 Setter 추가
-    public void setSecret(String secret) {
-        this.secret = secret;
-    }
-
-    public void setValidityInMilliseconds(long validityInMilliseconds) {
-        this.validityInMilliseconds = validityInMilliseconds;
     }
 }
