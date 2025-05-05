@@ -1,12 +1,37 @@
 // src/stores/useAuthStore.ts
-export const useAuth = () => {
-    const isLoggedIn = true // 테스트용. 실제 로그인 상태 연결 예정
-  
-    const logout = () => {
-      console.log("로그아웃 처리됨") // 실제론 localStorage 초기화 등
-      window.location.href = "/" // 홈으로 리다이렉트 등
+import { create } from 'zustand';
+import { loginApi, logoutApi } from '@/features/auth/api/authApi';
+
+interface AuthState {
+  token: string | null;
+  isAuthenticated: boolean;
+  login: (userid: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+}
+
+export const useAuthStore = create<AuthState>((set) => ({
+  token: localStorage.getItem('token'),
+  isAuthenticated: !!localStorage.getItem('token'),
+
+  login: async (userid, password) => {
+    try {
+      const response = await loginApi(userid, password);
+      const token = response.data.token;
+
+      localStorage.setItem('token', token);
+      set({ token, isAuthenticated: true });
+    } catch (error) {
+      console.error('로그인 실패:', error);
+      throw error;
     }
-  
-    return { isLoggedIn, logout }
-  }
-  
+  },
+
+  logout: async () => {
+    try {
+      await logoutApi(); // 실제 로그아웃 API가 없으면 생략해도 됨
+    } finally {
+      localStorage.removeItem('token');
+      set({ token: null, isAuthenticated: false });
+    }
+  },
+}));

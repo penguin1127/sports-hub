@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom"
-import { useAuth } from "@/stores/useAuthStore" // 로그인 상태 불러오기
+import { useAuthStore } from "@/stores/useAuthStore";
+
+const { token } = useAuthStore();// 로그인 상태 불러오기
 
 const Header = () => {
   const { isLoggedIn, logout } = useAuth() // ⚠️ logout 함수도 가정

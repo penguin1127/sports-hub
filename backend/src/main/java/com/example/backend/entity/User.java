@@ -6,11 +6,12 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "users")
-@Getter
-@Setter
+@Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString(exclude = {"joinedTeams"})
+@EqualsAndHashCode(exclude = {"joinedTeams"})
 public class User {
 
     @Id
@@ -28,6 +29,9 @@ public class User {
 
     @Column(length = 255, nullable = false)
     private String password;
+
+    @Column(name = "role", length = 50)
+    private String role;
 
     @Lob
     @Column(name = "joined_teams", columnDefinition = "TEXT")
@@ -56,7 +60,4 @@ public class User {
 
     @Column(name = "birth_date")
     private LocalDate birthDate;
-
-    @Column(length = 50)
-    private String role; // ex) "ROLE_USER", "ROLE_ADMIN"
 }

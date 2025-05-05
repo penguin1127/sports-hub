@@ -1,4 +1,3 @@
-// com.example.backend.controller.AuthController.java
 package com.example.backend.controller;
 
 import com.example.backend.dto.AuthRequestDTO;
@@ -15,17 +14,14 @@ public class AuthController {
 
     private final AuthService authService;
 
-    // 회원가입
     @PostMapping("/signup")
     public ResponseEntity<String> signup(@RequestBody AuthRequestDTO request) {
         authService.signUp(request);
-        return ResponseEntity.ok("회원가입 완료");
+        return ResponseEntity.ok("회원가입 성공");
     }
 
-    // 로그인
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@RequestBody AuthRequestDTO request) {
-        AuthResponseDTO response = authService.login(request);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(authService.login(request));
     }
 }
