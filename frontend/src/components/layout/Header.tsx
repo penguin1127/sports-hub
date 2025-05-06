@@ -1,10 +1,8 @@
-import { Link } from "react-router-dom"
-import { useAuthStore } from "@/stores/useAuthStore";
-
-const { token } = useAuthStore();// 로그인 상태 불러오기
+import { Link } from "react-router-dom";
+import { useAuthStore } from "@/stores/useAuthStore"; // ✅ Zustand 상태 불러오기
 
 const Header = () => {
-  const { isLoggedIn, logout } = useAuth() // ⚠️ logout 함수도 가정
+  const { isLoggedIn, logout } = useAuthStore(); // ✅ 로그인 상태 및 로그아웃
 
   return (
     <header className="sticky top-0 z-50 w-full bg-gray-800 shadow-md">
@@ -41,7 +39,7 @@ const Header = () => {
                 마이페이지
               </Link>
               <button
-                onClick={logout} // ✅ 로그아웃 동작
+                onClick={logout}
                 className="text-sm text-white border border-white px-3 py-1 rounded hover:bg-red-500"
               >
                 로그아웃
@@ -51,7 +49,7 @@ const Header = () => {
         </div>
       </div>
     </header>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;
