@@ -1,3 +1,6 @@
+현재 상황
+![image](https://github.com/user-attachments/assets/84c1f387-bca6-43aa-9bb5-d3ee454e42cc)![image](https://github.com/user-attachments/assets/df90ccf8-62d6-45ac-a1b4-a0b57d6fe9b1)
+
 ✅ 1. user 테이블
 설명: 사용자 계정 및 기본 정보 보관
 | Column Name           | Type         | Description                   |
