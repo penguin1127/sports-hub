@@ -37,6 +37,10 @@ public class AuthService {
     }
 
     public AuthResponseDTO login(AuthRequestDTO request) {
+        System.out.println("📥 로그인 요청 도착:");
+        System.out.println("  - userid: " + request.getUserid());
+        System.out.println("  - password(raw): " + request.getPassword());
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUserid(), request.getPassword())
         );

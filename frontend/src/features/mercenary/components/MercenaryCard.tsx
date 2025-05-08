@@ -1,5 +1,5 @@
-import { PostType } from "@/mock/mockRecruitPosts"
-
+//import { PostType } from "@/mock/mockRecruitPosts"
+import type { PostType } from "@/types/recruitPost"
 type Props = {
   post: PostType
   onClick: () => void
@@ -15,7 +15,10 @@ const MercenaryCard = ({ post, onClick }: Props) => {
       <div className="p-4 space-y-1">
         <div className="text-sm text-gray-500">[개인 → 팀]</div>
         <h3 className="text-lg font-semibold truncate">{post.title}</h3>
+        {/* <p className="text-sm text-gray-600">{post.region} ・ {post.date} {post.time}</p> */}
         <p className="text-sm text-gray-600">{post.region} ・ {post.date} {post.time}</p>
++        {/* 작성자 */}
++        <p className="text-sm text-gray-500">작성자: {post.author}</p>
       </div>
     </div>
   )

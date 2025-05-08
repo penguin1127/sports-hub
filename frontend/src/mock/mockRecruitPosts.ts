@@ -1,3 +1,6 @@
+//import type { RecruitPost } from "@/features/mercenary/api/recruitApi"
+// ← 이렇게 해보기  // ✅ 절대경로로 import
+
 export type PostType = {
   id: number
   category: "mercenary" | "team" | "match"

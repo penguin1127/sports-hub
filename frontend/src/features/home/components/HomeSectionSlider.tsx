@@ -1,6 +1,7 @@
 import { useRef } from "react"
 import { useNavigate } from "react-router-dom"
-import { PostType } from "@/mock/mockRecruitPosts"
+//import { PostType } from "@/mock/mockRecruitPosts"
+import type { PostType } from "@/types/recruitPost"
 import SummaryCard from "@/components/common/SummaryCard"
 
 type Props = {

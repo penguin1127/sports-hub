@@ -1,8 +1,9 @@
 import { useState } from "react"
 import HomeSectionSlider from "./HomeSectionSlider"
-import { PostType } from "@/mock/mockRecruitPosts"
+//import { PostType } from "@/mock/mockRecruitPosts"
 import RegionSelectTrigger from "./RegionSelectTrigger"
 import RegionSelectModal from "./RegionSelectModal"
+import type { PostType } from "@/types/recruitPost"
 
 type Props = {
   title: string

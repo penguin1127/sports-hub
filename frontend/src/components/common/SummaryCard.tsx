@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom"
-import { PostType } from "@/mock/mockRecruitPosts"
+import type { PostType } from "@/types/recruitPost"
 
 type CardProps = PostType
 
@@ -19,6 +19,7 @@ const SummaryCard = ({
   date,
   time,
   thumbnail_url,
+  author,
 }: CardProps) => {
   const navigate = useNavigate()
   const label = getLabel(category, target_type)
@@ -35,6 +36,8 @@ const SummaryCard = ({
       <img src={thumbnail_url} alt={title} className="h-40 w-full object-cover" />
       <div className="p-4 space-y-1">
         <div className="text-sm text-gray-500">{label}</div>
+        {/* 작성자 */}
+        <p className="text-sm text-gray-500">작성자: {author}</p>
         <h3 className="text-lg font-semibold truncate">{title}</h3>
         <p className="text-sm text-gray-600">{region} ・ {date} {time}</p>
       </div>
