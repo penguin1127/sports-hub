@@ -2,6 +2,8 @@
 
 현재 우리의 상황 
 
+DB테이블 설명
+
 ✅ 1. user 테이블
 설명: 사용자 계정 및 기본 정보 보관
 | Column Name           | Type         | Description                   |
