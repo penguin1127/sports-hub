@@ -1,6 +1,5 @@
-현재 우리의 상황
 ![image](https://github.com/user-attachments/assets/84c1f387-bca6-43aa-9bb5-d3ee454e42cc)
-
+현재 우리의 상황 
 ✅ 1. user 테이블
 설명: 사용자 계정 및 기본 정보 보관
 | Column Name           | Type         | Description                   |
