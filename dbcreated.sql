@@ -14,19 +14,21 @@ CREATE TABLE users (
   phone_number VARCHAR(20),
   birth_date DATE
 );
+
 CREATE TABLE team (
   teamid INT PRIMARY KEY AUTO_INCREMENT,
   team_name VARCHAR(100) NOT NULL,
-  captain_id BIGINT,  -- 반드시 users.id와 타입 일치
+  captain_id INT,  -- 반드시 users.id와 타입 일치
   create_date DATETIME DEFAULT CURRENT_TIMESTAMP,
   region VARCHAR(100),
   rival_teams TEXT,
   FOREIGN KEY (captain_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
+
 CREATE TABLE team_member (
   team_id INT,
-  user_id BIGINT,
+  user_id int,
   joined_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (team_id, user_id),
   FOREIGN KEY (team_id) REFERENCES team(teamid) ON DELETE CASCADE,
@@ -46,7 +48,7 @@ CREATE TABLE recruit_post (
 CREATE TABLE team_notice (
   notice_id INT PRIMARY KEY AUTO_INCREMENT,
   team_id INT NOT NULL,
-  author_id BIGINT,
+  author_id int,
   title VARCHAR(100) NOT NULL,
   content TEXT,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -90,7 +92,7 @@ INSERT INTO recruit_post (
 ('강서구 팀원 구인 중', 'MF 혹은 DF 모집. 수요일 훈련 필참 가능자.', '서울 강남구', '2025-04-22', '/images/team2.jpg', '2025-04-27', 1, 'mercenary', '팀');
 
 INSERT INTO recruit_post (
-  team_id, title, content, region, created_at, image_url, match_date,
+  post_id,  title, content, region, created_at, image_url, match_date,
   writer_id, category, target_type
 ) VALUES
 -- 게시글 1
@@ -109,6 +111,16 @@ INSERT INTO recruit_post (
 (NULL, '강서구 팀원 구인 중', 'MF 혹은 DF 모집. 수요일 훈련 필참 가능자.', '서울 강남구', '2025-04-22', '/images/team2.jpg', '2025-04-27', 1, 'mercenary', '팀');
 
 ALTER TABLE recruit_post MODIFY team_id INT NULL;
+
+SELECT * from users;
+SELECT * from recruit_post;
+
+ALTER TABLE recruit_post
+ADD COLUMN image_url VARCHAR(255),
+ADD COLUMN match_date DATE,
+ADD COLUMN writer_id INT;
+
+SHOW DATABASES;
 
 SELECT * from users;
 SELECT * from recruit_post;
