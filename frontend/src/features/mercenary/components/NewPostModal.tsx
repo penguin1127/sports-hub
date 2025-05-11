@@ -1,105 +1,99 @@
-import { useState } from "react"
-import type { PostType } from "@/types/recruitPost"
-import { useAuthStore } from "@/stores/useAuthStore"
+// src/features/mercenary/components/NewPostModal.tsx
 
-type Props = {
-  category: PostType["category"]
+import { useState } from "react"
+import { useAuthStore } from "@/stores/useAuthStore"
+import { PostType } from "@/types/recruitPost"
+
+interface Props {
+  category: "mercenary" | "team" | "match"
   onClose: () => void
   onSubmit: (post: PostType) => void
 }
 
-export default function NewPostModal({
-  category,
-  onClose,
-  onSubmit,
-}: Props) {
+const NewPostModal = ({ category, onClose, onSubmit }: Props) => {
   const user = useAuthStore((s) => s.user)
-  if (!user) {
-    alert("로그인이 필요합니다.")
-    onClose()
-    return null
-  }
 
-  const [title, setTitle] = useState<string>("")
-  const [content, setContent] = useState<string>("")
-  const [region, setRegion] = useState<string>("")
+  // 입력 필드 상태
+  const [title, setTitle] = useState("")
+  const [content, setContent] = useState("")
+  const [region, setRegion] = useState("")
 
-  const nowIso = new Date().toISOString()
-  const date = nowIso.split("T")[0] || ""
-  const time = nowIso.split("T")[1]?.slice(0, 5) || ""
-
+  // ✅ 등록 버튼 클릭 핸들러
   const handleSubmit = () => {
+    if (!user) {
+      alert("로그인이 필요합니다.")
+      return
+    }
+
+    if (!title || !content || !region) {
+      alert("모든 필드를 입력해주세요.")
+      return
+    }
+
     const newPost: PostType = {
-      id: Date.now(),
+      id: Date.now(), // 임시 ID (서버 연동 시 제거 예정)
       title,
       content,
       region,
       author: user.name,
-      created_at: nowIso,
-      category,
-      target_type: "user",
-      date,
-      time,
-      status: "open",
-      thumbnail_url: "",
-      description: content,
+
+      // PostType의 필수 필드 추가
+      description: "",
       image: "",
-      from: user.name,
+      from: "",
       to: "",
+      created_at: new Date().toISOString(),
+
+      category, // props로 전달된 category 사용
+      target_type: "team", // 기본값 설정 (필요 시 select 박스로 바꿔도 됨)
+      date: "2025-05-11", // 더미 날짜 (폼으로 교체 가능)
+      time: "19:00",
+      status: "모집중",
+      thumbnail_url: "",
     }
-    onSubmit(newPost)
-    onClose()
+
+    onSubmit(newPost) // Zustand store로 전달
+    onClose() // 모달 닫기
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-      <div className="bg-white rounded-lg p-6 w-96 max-w-full">
-        <h2 className="text-xl font-semibold mb-4">새 모집글 작성</h2>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div className="bg-white p-6 rounded w-[400px]">
+        <h2 className="text-xl font-semibold mb-4">✏️ 모집글 작성</h2>
 
-        <label className="block mb-2">
-          제목
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="mt-1 w-full border rounded px-2 py-1"
-          />
-        </label>
+        <input
+          type="text"
+          placeholder="제목"
+          className="w-full border p-2 mb-3"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <textarea
+          placeholder="내용"
+          className="w-full border p-2 mb-3"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          rows={4}
+        />
+        <input
+          type="text"
+          placeholder="지역"
+          className="w-full border p-2 mb-3"
+          value={region}
+          onChange={(e) => setRegion(e.target.value)}
+        />
 
-        <label className="block mb-2">
-          내용
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className="mt-1 w-full border rounded px-2 py-1 h-24"
-          />
-        </label>
-
-        <label className="block mb-4">
-          지역
-          <input
-            type="text"
-            value={region}
-            onChange={(e) => setRegion(e.target.value)}
-            className="mt-1 w-full border rounded px-2 py-1"
-          />
-        </label>
-
-        <div className="flex justify-end space-x-2">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 border rounded"
-          >
+        <div className="flex justify-end gap-2">
+          <button onClick={onClose} className="px-4 py-2 bg-gray-300 rounded">
             취소
           </button>
-          <button
-            onClick={handleSubmit}
-            className="px-4 py-2 bg-blue-600 text-white rounded"
-          >
-            작성 완료
+          <button onClick={handleSubmit} className="px-4 py-2 bg-blue-600 text-white rounded">
+            등록
           </button>
         </div>
       </div>
     </div>
   )
 }
+
+export default NewPostModal

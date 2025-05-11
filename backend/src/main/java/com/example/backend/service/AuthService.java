@@ -49,6 +49,6 @@ public class AuthService {
                 .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
 
         String token = jwtTokenProvider.generateToken(user.getUserid(), user.getRole());
-        return new AuthResponseDTO(token);
+        return new AuthResponseDTO(token, user);  // ✅ 사용자 정보도 함께 응답
     }
 }

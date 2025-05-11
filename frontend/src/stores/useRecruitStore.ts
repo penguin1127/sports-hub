@@ -1,20 +1,20 @@
 // src/stores/useRecruitStore.ts
+
 import { create } from "zustand"
+import { PostType } from "@/types/recruitPost"
 import { fetchRecruitPosts } from "@/features/mercenary/api/recruitApi"
-import type { PostType } from "@/types/recruitPost"
 
 interface RecruitState {
   posts: PostType[]
   loadPosts: () => Promise<void>
-  addPost: (post: PostType) => void  
+  createPost: (post: PostType) => void
   removePost: (id: number) => void
 }
 
 export const useRecruitStore = create<RecruitState>((set, get) => ({
-  // 1) 초기 상태
   posts: [],
 
-  // 2) 데이터 로드 액션
+  // 게시글 리스트 로딩
   loadPosts: async () => {
     try {
       const data = await fetchRecruitPosts()
@@ -24,13 +24,13 @@ export const useRecruitStore = create<RecruitState>((set, get) => ({
     }
   },
 
-  addPost: (post) => {
+  // 새 게시글 추가
+  createPost: (post) => {
     set({ posts: [post, ...get().posts] })
   },
 
-  // 3) 삭제 액션: get()으로 현재 상태(posts)를 꺼내고, filter 후 set
-  removePost: (id: number) => {
-    const current = get().posts
-    set({ posts: current.filter((p: PostType) => p.id !== id) })
+  // 게시글 삭제
+  removePost: (id) => {
+    set({ posts: get().posts.filter((p) => p.id !== id) })
   },
 }))

@@ -1,37 +1,39 @@
-// src/stores/useAuthStore.ts
-import { create } from "zustand"
+import { create } from "zustand";
 
 interface User {
-  name: string
-  // 필요 시 email, id 등 추가
+  id: number;
+  userid: string;
+  name: string;
+  email?: string;
 }
 
 interface AuthState {
-  token: string | null
-  user: User | null
-  isLoggedIn: boolean
-  login: (token: string, user: User) => void
-  logout: () => void
+  token: string | null;
+  user: User | null;
+  isLoggedIn: boolean;
+  login: (token: string, user: User) => void;
+  logout: () => void;
 }
 
-// localStorage 복원용 초기값
-const storedToken = localStorage.getItem("token")
-const storedUser = localStorage.getItem("user")
+// 🔁 localStorage에서 초기값 불러오기
+const storedToken = localStorage.getItem("token");
+const storedUser = localStorage.getItem("user");
+const parsedUser = storedUser && storedUser !== "undefined" ? JSON.parse(storedUser) : null;
 
 export const useAuthStore = create<AuthState>((set) => ({
-  token: storedToken,
-  user: storedUser ? JSON.parse(storedUser) : null,
-  isLoggedIn: !!storedToken,
+  token: storedToken ?? null,
+  user: parsedUser,
+  isLoggedIn: !!storedToken && !!parsedUser,
 
   login: (token, user) => {
-    localStorage.setItem("token", token)
-    localStorage.setItem("user", JSON.stringify(user))  // ✅ 추가 저장
-    set({ token, user, isLoggedIn: true })
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user)); // ✅ 직렬화하여 저장
+    set({ token, user, isLoggedIn: true });
   },
 
   logout: () => {
-    localStorage.removeItem("token")
-    localStorage.removeItem("user")  // ✅ 추가 제거
-    set({ token: null, user: null, isLoggedIn: false })
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    set({ token: null, user: null, isLoggedIn: false });
   },
-}))
+}));

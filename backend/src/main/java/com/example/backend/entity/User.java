@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
 
+/**
+ * 사용자(User) 엔티티 - 기본 회원 정보와 활동 정보 포함
+ */
 @Entity
 @Table(name = "users")
 @Getter @Setter
@@ -30,14 +33,14 @@ public class User {
     @Column(length = 255, nullable = false)
     private String password;
 
-    @Column(name = "role", length = 50)
+    @Column(length = 50)
     private String role;
 
     @Lob
     @Column(name = "joined_teams", columnDefinition = "TEXT")
     private String joinedTeams;
 
-    @Column(name = "is_ex_player", length = 50)
+    @Column(length = 50)
     private String isExPlayer;
 
     @Column(length = 100)
@@ -46,18 +49,12 @@ public class User {
     @Column(name = "preferred_position", length = 50)
     private String preferredPosition;
 
-    @Column(name = "is_captain")
     private Boolean isCaptain;
 
-    @Column(name = "phone_number", length = 20)
+    @Column(length = 20)
     private String phoneNumber;
 
-    @Column(name = "activity_start_date")
     private LocalDate activityStartDate;
-
-    @Column(name = "activity_end_date")
     private LocalDate activityEndDate;
-
-    @Column(name = "birth_date")
     private LocalDate birthDate;
 }
