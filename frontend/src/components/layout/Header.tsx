@@ -1,49 +1,68 @@
-import { Link } from "react-router-dom";
-import { useAuthStore } from "@/stores/useAuthStore"; // ✅ Zustand 상태 불러오기
+import { Link, useNavigate } from "react-router-dom";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 const Header = () => {
-  const { isLoggedIn, logout } = useAuthStore(); // ✅ 로그인 상태 및 로그아웃
+  const navigate = useNavigate();
+  const { isLoggedIn, user, logout } = useAuthStore();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-gray-800 shadow-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <header className="bg-[#0f1625] py-5 text-white"> {/* ← py-3 → py-5 로 높이 증가 */}
+      <div className="max-w-screen-xl mx-auto flex justify-between items-center px-4">
         {/* 로고 */}
-        <Link to="/" className="text-xl font-bold text-white">
-          Sport-Hub
+        <Link to="/" className="text-2xl font-bold tracking-wide">
+          <span className="border-r pr-3 mr-3 text-white">Sport-Hub</span>
         </Link>
 
-        {/* 네비게이션 메뉴 */}
-        <nav className="flex gap-6 text-white font-medium">
-          <Link to="/mercenary" className="hover:text-blue-400">용병</Link>
-          <Link to="/team" className="hover:text-blue-400">팀</Link>
-          <Link to="/match" className="hover:text-blue-400">경기</Link>
-          {isLoggedIn && (
-            <Link to="/team-manage" className="hover:text-blue-400">팀 관리</Link>
-          )}
+        {/* 중앙 메뉴 */}
+        <nav className="flex gap-8 text-white text-base font-sans">
+          <Link to="/mercenary" className="text-white hover:text-white">용병 목록</Link>
+          <Link to="/team" className="text-white hover:text-white">팀 모집</Link>
+          <Link to="/apply" className="text-white hover:text-white">개인 지원</Link>
+          <Link to="/match" className="text-white hover:text-white">경기 모집</Link>
         </nav>
 
-        {/* 우측 버튼 */}
-        <div className="flex gap-3 items-center">
-          {!isLoggedIn ? (
+        {/* 오른쪽 버튼 */}
+        <div className="flex items-center gap-4">
+          {isLoggedIn ? (
             <>
-              <Link to="/login" className="text-sm border border-slate-300 rounded px-3 py-1 hover:bg-slate-100 text-white">
-                로그인
-              </Link>
-              <Link to="/signup" className="text-sm border border-slate-300 rounded px-3 py-1 hover:bg-slate-100 text-white">
-                회원가입
-              </Link>
-            </>
-          ) : (
-            <>
-              <Link to="/mypage" className="text-sm text-white hover:underline">
-                마이페이지
+              <button
+                className="bg-yellow-400 hover:bg-yellow-300 text-black px-4 py-1 rounded text-sm"
+                onClick={() => alert("알림센터 클릭")}
+              >
+                알림센터
+              </button>
+              <Link
+                to="/mypage"
+                className="text-white hover:underline text-sm tracking-wide"
+              >
+                {user?.name}
               </Link>
               <button
-                onClick={logout}
-                className="text-sm text-white border border-white px-3 py-1 rounded hover:bg-red-500"
+                className="bg-red-500 hover:bg-red-400 text-white px-4 py-1 rounded text-sm"
+                onClick={handleLogout}
               >
                 로그아웃
               </button>
+            </>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className="bg-red-500 hover:bg-red-400 text-white px-4 py-1 rounded text-sm"
+              >
+                로그인
+              </Link>
+              <Link
+                to="/register"
+                className="bg-gray-100 hover:bg-gray-200 text-black px-4 py-1 rounded text-sm"
+              >
+                회원가입
+              </Link>
             </>
           )}
         </div>
