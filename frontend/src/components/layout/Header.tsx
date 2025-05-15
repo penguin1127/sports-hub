@@ -11,7 +11,7 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-[#0f1625] py-5 text-white"> {/* ← py-3 → py-5 로 높이 증가 */}
+    <header className="bg-[#0f1625] py-5 text-white">
       <div className="max-w-screen-xl mx-auto flex justify-between items-center px-4">
         {/* 로고 */}
         <Link to="/" className="text-2xl font-bold tracking-wide">
@@ -26,7 +26,7 @@ const Header = () => {
           <Link to="/match" className="text-white hover:text-white">경기 모집</Link>
         </nav>
 
-        {/* 오른쪽 버튼 */}
+        {/* 오른쪽 버튼들 */}
         <div className="flex items-center gap-4">
           {isLoggedIn ? (
             <>

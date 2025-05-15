@@ -1,40 +1,34 @@
-import axiosInstance from "@/lib/axiosInstance";
+// src/features/auth/api/authApi.ts
 
-/** 사용자 타입 정의 */
-interface User {
-  id: number;
-  userid: string;
-  name: string;
-  email?: string;
-  // 필요한 경우, 추가 필드 작성 가능
-}
+import axiosInstance from "@/lib/axiosInstance"
 
 /**
- * 로그인 요청
- * @param userid 사용자 ID
+ * 🟢 로그인 요청 API
+ * @param userid 사용자 아이디
  * @param password 비밀번호
- * @returns JWT 토큰과 사용자 정보
+ * @returns JWT 토큰만 반환
+ */
+/**
+ * 로그인 요청
  */
 export const loginApi = async (
   userid: string,
   password: string
-): Promise<{ data: { token: string; user: User } }> => {
-  return axiosInstance.post("/api/auth/login", { userid, password });
+): Promise<{ data: { token: string; user: any } }> => {
+  return axiosInstance.post("/auth/login", { userid, password });
 };
 
+
 /**
- * 회원가입 요청
+ * 🟡 회원가입 요청 API
+ * @param userid 사용자 아이디
+ * @param password 비밀번호
+ * @returns 성공 메시지 (서버 구현에 따라 변경 가능)
  */
 export const signupApi = async (
   userid: string,
   password: string
-): Promise<{ data: string }> => {
-  return axiosInstance.post("/api/auth/signup", { userid, password });
-};
-
-/**
- * 로그아웃 요청 (서버 필요 시)
- */
-export const logoutApi = async () => {
-  // 서버에 로그아웃 API가 있다면 여기에 작성
-};
+): Promise<{ message: string }> => {
+  const response = await axiosInstance.post("/api/auth/signup", { userid, password })
+  return response.data as { message: string }
+}
