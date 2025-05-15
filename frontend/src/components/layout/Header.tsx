@@ -22,8 +22,10 @@ const Header = () => {
         <nav className="flex gap-8 text-white text-base font-sans">
           <Link to="/mercenary" className="text-white hover:text-white">용병 목록</Link>
           <Link to="/team" className="text-white hover:text-white">팀 모집</Link>
-          <Link to="/apply" className="text-white hover:text-white">개인 지원</Link>
-          <Link to="/match" className="text-white hover:text-white">경기 모집</Link>
+          <Link to="/apply" className="text-white hover:text-white">경기 모집</Link>
+          {isLoggedIn && (
+          <Link to="/match" className="text-white hover:text-white">팀관리</Link>
+          )}
         </nav>
 
         {/* 오른쪽 버튼들 */}
