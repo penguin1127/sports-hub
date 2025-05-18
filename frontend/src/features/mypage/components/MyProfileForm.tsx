@@ -1,6 +1,6 @@
 // src/features/mypage/components/MyProfileForm.tsx
 
-import { useEffect, useState } from "react";
+import { useEffect, useState,useRef } from "react";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { getMyProfile } from "@/features/auth/api/userApi";
 import { User } from "@/types/user";
@@ -8,17 +8,21 @@ import { User } from "@/types/user";
 const MyProfileForm = () => {
   const [profile, setProfile] = useState<User | null>(null);
   const { token } = useAuthStore();
+   const fetchCount = useRef(0); // useRef로 호출 횟수 추적
 
   // ⛳ 내 정보 불러오기
   useEffect(() => {
     const fetchProfile = async () => {
+      console.log("[MyProfileForm] fetchProfile 시작");
       try {
+        console.log("/api/users/me 요청 보냄!");
         const data = await getMyProfile();
         setProfile(data);
         console.log("불러온 사용자 정보:", data);
       } catch (error) {
         console.error("프로필 불러오기 실패:", error);
       }
+       console.log("[MyProfileForm] fetchProfile 끝");
     };
 
     if (token) {

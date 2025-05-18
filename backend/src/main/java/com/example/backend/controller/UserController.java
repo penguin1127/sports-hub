@@ -3,6 +3,9 @@ package com.example.backend.controller;
 import com.example.backend.entity.User;
 import com.example.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,5 +27,17 @@ public class UserController {
     @PostMapping
     public User createUser(@RequestBody User user) {
         return userRepository.save(user);
+    }
+
+    // ✅ 내 정보 조회
+    @GetMapping("/me")
+    public ResponseEntity<User> getMyInfo() {
+        // 현재 인증된 사용자 정보 가져오는 로직
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String userid = userDetails.getUsername(); // UserDetails에서 userid(username) 추출
+        User currentUser = userRepository.findByUserid(userid)
+                .orElseThrow(() -> new RuntimeException("사용자 정보를 찾을 수 없습니다."));
+
+        return ResponseEntity.ok(currentUser);
     }
 }

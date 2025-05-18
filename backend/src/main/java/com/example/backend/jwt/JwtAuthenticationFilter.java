@@ -1,12 +1,15 @@
 package com.example.backend.jwt;
 
+import com.example.backend.security.CustomUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -22,6 +25,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final CustomUserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -41,9 +45,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // 토큰 유효 시 인증 정보 저장
         if (token != null && jwtTokenProvider.validateToken(token)) {
-            var authentication = (UsernamePasswordAuthenticationToken) jwtTokenProvider.getAuthentication(token);
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            Authentication authentication = jwtTokenProvider.getAuthentication(token); // ✅ getAuthentication() 호출
+            String userid = authentication.getName(); // ✅ Authentication에서 userid 추출
+            UserDetails userDetails = userDetailsService.loadUserByUsername(userid);
+            var authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities()); // 변수명 변경 (authentication -> authenticationToken)
+            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken); // authenticationToken으로 변경
         }
 
         filterChain.doFilter(request, response);
