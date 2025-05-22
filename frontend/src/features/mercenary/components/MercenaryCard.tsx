@@ -1,4 +1,3 @@
-//import { PostType } from "@/mock/mockRecruitPosts"
 import type { PostType } from "@/types/recruitPost"
 type Props = {
   post: PostType
