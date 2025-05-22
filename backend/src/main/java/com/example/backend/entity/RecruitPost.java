@@ -21,13 +21,13 @@ public class RecruitPost {
     @Column(name = "post_id") // 실제 DB 컬럼명과 일치시킴
     private Long id;
 
-    @OneToOne
+    @ManyToOne // 하나의 팀이 여러개의 공고를 올릴 수도 있음(이력에도 남아야 함.)
     @JoinColumn(name = "team_id")
     private Team teamId; // 팀 id 외래키
 
-    @OneToOne
+    @ManyToOne // 한명의 작성자가 여러개를 작성할 수도 있음(이력에도 남아야 함.)
     @JoinColumn(name = "writer_id")
-    private RecruitApplication writerId; // 기다리는 사람의 id(신청 대기 테이블 참조)
+    private User writerId; // 글을 작성한 유저의 id
 
     @Column(name = "title", nullable = false)
     private String title;
