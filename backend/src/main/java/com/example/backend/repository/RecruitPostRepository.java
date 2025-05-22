@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 /**
  * RecruitPost에 대한 DB 접근을 담당하는 JPA 리포지토리
  */
-@Repository
+
 public interface RecruitPostRepository extends JpaRepository<RecruitPost, Long> {
 }

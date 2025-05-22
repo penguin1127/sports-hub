@@ -24,6 +24,9 @@ public class RecruitApplyController {
     CustomUserDetails customUserDetails){ // 이름, 설명이 들어있음, dto 클래스 자동 초기화, user_id 같은 경우에는 @AuthenticationPrincipal를 사용
 
         // 사용자의 이름 등을 팀장한테 보내야 함.
+        // 현재 로그인한 사용자 정보 주입(로그인은 시큐리티에 저장되어 있는걸로)
+        dto.setUserId(customUserDetails.getUser().getId()); //RecruitApplyDTO.userId를 int로 하면 안되고 Long으로 해야함
+        dto.setUsername(customUserDetails.getUsername());
         //.findByUsername(userDetails.getUsername())
         recruitApplyService.apply(dto);
         return "신청 완료! 승인이 되면 알려드립니다.";

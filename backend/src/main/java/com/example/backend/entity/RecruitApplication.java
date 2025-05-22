@@ -2,21 +2,19 @@ package com.example.backend.entity;
 
 import com.example.backend.Enum.ApplicationStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.Date;
 
 // 신청 대기 테이블(신청한 사용자도 수락, 거절, 대기 여부를 볼 수 있다는 장점 존재.)
-@Table(name = "recruit_application")
+//@Table(name = "recruit_application")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Builder
 public class RecruitApplication {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // id 자동 증가
@@ -41,9 +39,10 @@ public class RecruitApplication {
     private LocalDateTime applicationDate; // 신청 날짜와 시간을 담음.(날짜와 시간을 담기 위해 LocalDateTime 사용)
 
 
-    public RecruitApplication(User userId, String description, LocalDateTime applicationDate){
-        this.userId = userId;
+    /*
+    public RecruitApplication(User user, String description, LocalDateTime applicationDate){
+        this.user = user;
         this.description = description;
         this.applicationDate = applicationDate;
-    }
+    }*/
 }
