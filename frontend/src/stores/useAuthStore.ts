@@ -7,7 +7,7 @@ interface User {
   name: string;
   userid: string;
   region?: string;
-  preferred_position?: string;
+  preferredPosition?: string;
 }
 
 interface AuthState {

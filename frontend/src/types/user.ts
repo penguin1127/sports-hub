@@ -7,7 +7,7 @@ export interface User {
   phone_number?: string;
   birth_date?: string;
   region?: string;
-  preferred_position?: string;
+  preferredPosition?: string;
   is_ex_player?: boolean;
   is_captain?: boolean;
   joined_teams?: string;
