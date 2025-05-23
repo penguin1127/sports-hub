@@ -1,14 +1,15 @@
-// AuthRequestDTO.java
 package com.example.backend.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+/**
+ * 로그인/회원가입 요청 시 사용하는 DTO
+ */
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@Setter
 public class AuthRequestDTO {
-    private String username;
+    private String userid;
     private String password;
+    private String name;  // 회원가입 시만 사용
 }
