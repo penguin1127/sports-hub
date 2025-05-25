@@ -1,7 +1,7 @@
 // src/main/java/com/example/backend/controller/AuthController.java
 package com.example.backend.controller;
 
-import com.example.backend.dto.AuthLoginResponseDto; // 새로 정의할 로그인 응답 DTO
+import com.example.backend.dto.auth.AuthLoginResponseDto; // 새로 정의할 로그인 응답 DTO
 import com.example.backend.dto.user.UserLoginRequestDto; // 로그인 요청 DTO
 import com.example.backend.dto.user.UserResponseDto; // 사용자 정보 응답 DTO
 import com.example.backend.dto.user.UserSignUpRequestDto; // 회원가입 요청 DTO

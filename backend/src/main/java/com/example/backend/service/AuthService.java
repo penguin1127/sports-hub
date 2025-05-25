@@ -1,7 +1,7 @@
 // src/main/java/com/example/backend/service/AuthService.java
 package com.example.backend.service;
 
-import com.example.backend.dto.AuthLoginResponseDto; // AuthLoginResponseDto 임포트
+import com.example.backend.dto.auth.AuthLoginResponseDto; // AuthLoginResponseDto 임포트
 import com.example.backend.dto.user.UserLoginRequestDto;
 import com.example.backend.dto.user.UserResponseDto; // UserResponseDto 임포트
 import com.example.backend.entity.User;

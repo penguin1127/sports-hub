@@ -1,5 +1,5 @@
 // src/main/java/com/example/backend/dto/AuthLoginResponseDto.java
-package com.example.backend.dto;
+package com.example.backend.dto.auth;
 
 import com.example.backend.dto.user.UserResponseDto; // UserResponseDto import
 import lombok.AllArgsConstructor;
