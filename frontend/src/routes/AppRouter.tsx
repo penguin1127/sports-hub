@@ -3,8 +3,10 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import HomePage from "@/features/home/pages/HomePage";
 import MercenaryPage from "@/features/mercenary/pages/MercenaryPage";
+import TeamPage from "@/features/team/pages/TeamPage"; // 새로 만든 TeamPage 임포트
+import MatchPage from "@/features/match/pages/MatchPage"; // 새로 만든 MatchPage 임포트
 import TeamManagePage from "@/features/team-manage/pages/TeamManagePage";
-import TeamDetailPage from "@/features/team-manage/pages/TeamDetailPage";
+import TeamDetailPage from "@/features/team-manage/pages/TeamDetailPage"; // 팀 상세 페이지 (만약 TeamPage와 역할이 다르다면)
 import MyPage from "@/features/mypage/pages/MyPage";
 import LoginPage from "@/features/auth/pages/LoginPage";
 import SignupPage from "@/features/auth/pages/SignupPage";
@@ -17,22 +19,21 @@ const AppRouter = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* 기본 레이아웃이 적용되는 페이지 */}
         <Route element={<Layout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/mercenary" element={<MercenaryPage />} />
-          <Route path="/team" element={<Team />} />
-          <Route path="/match" element={<Match />} />
+          <Route path="/team" element={<TeamPage />} /> {/* TeamPage로 교체 */}
+          <Route path="/match" element={<MatchPage />} /> {/* MatchPage로 교체 */}
           <Route path="/team-manage" element={<TeamManagePage />} />
-          <Route path="/team/:id" element={<TeamDetailPage />} />
+          {/* TeamDetailPage는 TeamPage와 역할이 겹치는지, 아니면 별도의 상세 정보 페이지인지 확인 필요 */}
+          {/* 만약 TeamPage가 목록과 상세보기를 모두 처리한다면 /team/:id 경로는 불필요하거나 TeamPage로 연결 */}
+          <Route path="/team/:id" element={<TeamDetailPage />} /> {/* 현재는 유지, 필요시 TeamPage로 변경 가능 */}
           <Route path="/mypage" element={<MyPage />} />
         </Route>
 
-        {/* 로그인/회원가입 페이지는 Layout 없이 단독 렌더링 */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
 
-        {/* 404 처리 */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

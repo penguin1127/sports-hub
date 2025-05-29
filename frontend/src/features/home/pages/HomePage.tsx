@@ -1,22 +1,57 @@
 // src/features/home/pages/HomePage.tsx
-import { useEffect } from "react"
-import HomeSectionFilterWrapper from "@/features/home/components/HomeSectionFilterWrapper"
-import { useRecruitStore } from "@/stores/useRecruitStore"
-import { RecruitCategory } from "@/types/recruitPost" // RecruitCategory 임포트
+import { useEffect, useState } from "react";
+import HomeSectionFilterWrapper from "@/features/home/components/HomeSectionFilterWrapper";
+import { fetchRecruitPosts } from "@/features/mercenary/api/recruitApi"; // API 함수 경로 확인
+import { PostType, RecruitCategory } from "@/types/recruitPost";
 
 export default function HomePage() {
-  const posts = useRecruitStore((s) => s.posts)
-  const loadPosts = useRecruitStore((s) => s.loadPosts) // 또는 loadAllHomepagePosts 등
+  const [mercenaryPosts, setMercenaryPosts] = useState<PostType[]>([]);
+  const [teamPosts, setTeamPosts] = useState<PostType[]>([]);
+  const [matchPosts, setMatchPosts] = useState<PostType[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Helper function to convert enum value to lowercase string for URL path
+  const categoryEnumToPathString = (categoryEnum: RecruitCategory): string => {
+    return categoryEnum.toString().toLowerCase();
+  };
 
   useEffect(() => {
-    // 예시: loadPosts(RecruitCategory.MERCENARY) 또는 loadAllHomepagePosts() 등
-    loadPosts(RecruitCategory.MERCENARY);
-  }, [loadPosts])
+    const loadHomepageData = async () => {
+      setIsLoading(true);
+      try {
+        const mercenaryDataPromise = fetchRecruitPosts(RecruitCategory.MERCENARY, 0, 10);
+        const teamDataPromise = fetchRecruitPosts(RecruitCategory.TEAM, 0, 10);
+        const matchDataPromise = fetchRecruitPosts(RecruitCategory.MATCH, 0, 10);
+
+        const [mercenaries, teams, matches] = await Promise.all([
+          mercenaryDataPromise,
+          teamDataPromise,
+          matchDataPromise,
+        ]);
+
+        setMercenaryPosts(mercenaries);
+        setTeamPosts(teams);
+        setMatchPosts(matches);
+      } catch (error) {
+        console.error("Error loading homepage data:", error);
+        setMercenaryPosts([]);
+        setTeamPosts([]);
+        setMatchPosts([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadHomepageData();
+  }, []);
+
+  if (isLoading) {
+    return <div className="text-center py-20">데이터를 불러오는 중입니다...</div>;
+  }
 
   return (
-    <div className="flex flex-col gap-12 max-w-screen-xl mx-auto px-4">
-      {/* Hero 섹션 (이 부분이 배너일 수 있습니다) */}
-      <section className="bg-slate-100 py-10 text-center">
+    <div className="flex flex-col gap-12 max-w-screen-xl mx-auto px-4 pt-4">
+      <section className="bg-slate-100 py-10 text-center rounded-lg">
         <h1 className="text-3xl font-bold">
           ⚽ 조기축구 인원 모집 플랫폼
         </h1>
@@ -25,30 +60,30 @@ export default function HomePage() {
         </p>
       </section>
 
-      {/* 용병 모집 */}
       <HomeSectionFilterWrapper
         title="🔥 용병 모집"
         category={RecruitCategory.MERCENARY}
-        allPosts={posts}
+        allPosts={mercenaryPosts}
+        basePath={`/${categoryEnumToPathString(RecruitCategory.MERCENARY)}`}
       />
 
-      <div className="border-t border-gray-200 mx-4" />
+      <div className="border-t border-gray-200" />
 
-      {/* 팀 모집 */}
       <HomeSectionFilterWrapper
         title="🛡️ 팀 모집"
         category={RecruitCategory.TEAM}
-        allPosts={posts} // TODO: 실제 팀 데이터를 로드하여 전달해야 함
+        allPosts={teamPosts}
+        basePath={`/${categoryEnumToPathString(RecruitCategory.TEAM)}`}
       />
 
-      <div className="border-t border-gray-200 mx-4" />
+      <div className="border-t border-gray-200" />
 
-      {/* 경기 모집 */}
       <HomeSectionFilterWrapper
         title="🏟️ 경기 모집"
         category={RecruitCategory.MATCH}
-        allPosts={posts} // TODO: 실제 경기 데이터를 로드하여 전달해야 함
+        allPosts={matchPosts}
+        basePath={`/${categoryEnumToPathString(RecruitCategory.MATCH)}`}
       />
     </div>
-  )
+  );
 }
