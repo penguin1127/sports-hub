@@ -73,3 +73,14 @@ export interface UserProfileUpdateDto {
   activityEndDate?: string;      // Java의 LocalDate는 string으로
   birthDate?: string;            // Java의 LocalDate는 string으로
 }
+
+export interface PublicUserProfileResponseDto {
+  id: number;
+  name: string;
+  userid: string; // 또는 loginId 등 백엔드 DTO 필드명과 일치
+  region?: string;
+  preferredPosition?: string;
+  isExPlayer?: boolean;
+  // 백엔드 PublicUserProfileResponseDto에 정의된 다른 공개 필드들
+}
+

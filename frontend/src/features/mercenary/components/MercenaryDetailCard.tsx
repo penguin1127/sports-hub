@@ -1,9 +1,9 @@
 // src/features/mercenary/components/MercenaryDetailCard.tsx
 
-import type { PostType } from "@/types/recruitPost";
-// Enum을 값으로 사용하므로 일반 import
+import React from 'react'; // React 임포트
+import type { PostType } from "@/types/recruitPost"; // PostType은 타입으로만 사용될 수 있음
+// Enum을 값으로 사용하므로 일반 import로 변경
 import { RecruitCategory, RecruitTargetType, RecruitStatus } from "@/types/recruitPost";
-import { JSX } from "react";
 
 // Props 타입 정의
 interface MercenaryDetailCardProps {
@@ -12,51 +12,49 @@ interface MercenaryDetailCardProps {
   onClose?: () => void;
   onExpand?: () => void;
   onDelete?: () => void;
+  onAuthorNameClick?: () => void; // 작성자 이름 클릭 핸들러 prop 추가
 }
 
-// 상태에 따른 텍스트 및 스타일 반환 헬퍼 함수 (SummaryCard와 중복되므로 utils로 분리 권장)
-const getStatusDisplayForDetail = (status: PostType["status"]): JSX.Element => {
+// 상태에 따른 텍스트 및 스타일 반환 헬퍼 함수
+const getStatusDisplayForDetail = (statusValue: PostType["status"]): React.ReactNode => {
   let styleClass = "font-semibold ";
-  let statusText = status as string; // PostType.status가 string인 경우
+  let statusText = statusValue as string; // PostType.status가 string이라고 가정
 
-  // PostType.status가 RecruitStatus Enum 타입이라면 RecruitStatus.RECRUITING 등으로 직접 비교
-  // 현재 recruitPost.ts의 PostType.status는 string이므로, Enum의 문자열 값과 비교
-  if (status === RecruitStatus.RECRUITING) {
+  // RecruitStatus Enum 값과 직접 비교
+  if (statusValue === RecruitStatus.RECRUITING) {
     styleClass += "text-green-600";
     statusText = "모집중";
-  } else if (status === RecruitStatus.COMPLETED) {
+  } else if (statusValue === RecruitStatus.COMPLETED) {
     styleClass += "text-blue-600";
     statusText = "모집완료";
-  } else if (status === RecruitStatus.IN_PROGRESS) {
+  } else if (statusValue === RecruitStatus.IN_PROGRESS) {
     styleClass += "text-yellow-600";
     statusText = "진행/경기중";
-  } else if (status === RecruitStatus.CANCELLED) {
+  } else if (statusValue === RecruitStatus.CANCELLED) {
      styleClass += "text-red-600";
      statusText = "모집취소";
-  } else if (status === RecruitStatus.FINISHED) {
+  } else if (statusValue === RecruitStatus.FINISHED) {
      styleClass += "text-gray-600";
      statusText = "종료";
   } else {
-    styleClass += "text-gray-700";
+    styleClass += "text-gray-700"; // 알 수 없는 상태 또는 기본 상태
   }
   return <span className={styleClass}>{statusText}</span>;
 };
 
-
-const MercenaryDetailCard = ({ post, isExpanded, onClose, onExpand, onDelete }: MercenaryDetailCardProps) => {
+const MercenaryDetailCard = ({ post, isExpanded, onClose, onExpand, onDelete, onAuthorNameClick }: MercenaryDetailCardProps) => {
   const {
     title,
-    category,
-    targetType,
+    category, // 타입: RecruitCategory (Enum의 문자열 값)
+    targetType, // 타입: RecruitTargetType (Enum의 문자열 값)
     region,
     subRegion,
     gameDate,
     gameTime,
     thumbnailUrl,
     authorName,
-    status,
-    content, // 상세 내용
-    // PostType에서 필요한 다른 필드들 (예: requiredPersonnel, ageGroup 등)
+    status, // 타입: RecruitStatus (Enum의 문자열 값) 또는 string
+    content,
     requiredPersonnel,
     ageGroup,
     preferredPositions,
@@ -67,6 +65,7 @@ const MercenaryDetailCard = ({ post, isExpanded, onClose, onExpand, onDelete }: 
   const formattedTime = gameTime || "시간 미정";
 
   let recruitmentLabel: string | null = null;
+  // Enum 값을 직접 비교
   if (category !== RecruitCategory.MATCH) {
     if (targetType === RecruitTargetType.USER) {
       recruitmentLabel = category === RecruitCategory.MERCENARY ? "팀 → 용병(개인)" : "팀 → 팀원";
@@ -109,7 +108,7 @@ const MercenaryDetailCard = ({ post, isExpanded, onClose, onExpand, onDelete }: 
   }
 
   return (
-    <div className="bg-white shadow-xl rounded-lg p-6 col-span-1 sm:col-span-2 lg:col-span-3 xl:col-span-4"> {/* 상세 보기 시 더 넓게 표시 */}
+    <div className="bg-white shadow-xl rounded-lg p-6 col-span-1 sm:col-span-2 lg:col-span-3 xl:col-span-4">
       <div className="flex justify-between items-start mb-4">
         <div>
           {recruitmentLabel && (
@@ -129,9 +128,24 @@ const MercenaryDetailCard = ({ post, isExpanded, onClose, onExpand, onDelete }: 
       <div className="text-sm text-gray-700 space-y-2">
         <p><strong>지역:</strong> {region}{subRegion ? `, ${subRegion}` : ''}</p>
         <p><strong>일시:</strong> {formattedDate} {formattedTime}</p>
-        {authorName && <p><strong>작성자:</strong> <span className="text-blue-600 hover:underline cursor-pointer" onClick={() => alert(`'${authorName}' 프로필 보기`)}>{authorName}</span></p>}
+        {authorName && (
+          <p>
+            <strong>작성자:</strong>{' '}
+            <span 
+              className={`text-blue-600 ${onAuthorNameClick ? 'hover:underline cursor-pointer' : ''}`}
+              onClick={(e) => {
+                if (onAuthorNameClick) {
+                  e.stopPropagation();
+                  onAuthorNameClick();
+                }
+              }}
+            >
+              {authorName}
+            </span>
+          </p>
+        )}
         {status && <p><strong>상태:</strong> {getStatusDisplayForDetail(status)}</p>}
-        {requiredPersonnel && <p><strong>필요인원:</strong> {requiredPersonnel}명</p>}
+        {requiredPersonnel != null && <p><strong>필요인원:</strong> {requiredPersonnel}명</p>}
         {ageGroup && <p><strong>연령대:</strong> {ageGroup}</p>}
         {preferredPositions && <p><strong>선호 포지션:</strong> {preferredPositions}</p>}
         {matchRules && <p className="mt-1 whitespace-pre-wrap"><strong>경기 규칙:</strong><br/>{matchRules}</p>}
@@ -140,10 +154,7 @@ const MercenaryDetailCard = ({ post, isExpanded, onClose, onExpand, onDelete }: 
 
       {onDelete && (
         <div className="mt-6 text-right">
-          <button
-            onClick={(e) => { e.stopPropagation(); onDelete(); }}
-            className="bg-red-500 hover:bg-red-600 text-white text-sm px-4 py-2 rounded"
-          >
+          <button onClick={(e) => { e.stopPropagation(); onDelete(); }} className="bg-red-500 hover:bg-red-600 text-white text-sm px-4 py-2 rounded">
             삭제
           </button>
         </div>
