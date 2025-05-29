@@ -1,70 +1,109 @@
 // src/components/common/SummaryCard.tsx
 
-import { useNavigate } from "react-router-dom"; // Link 대신 navigate를 사용하고 있다면 유지
-import type { PostType } from "@/types/recruitPost"; // PostType 경로는 실제 프로젝트에 맞게
+import {
+  PostType,
+  RecruitCategory,
+  RecruitTargetType,
+  RecruitStatus
+} from "@/types/recruitPost"; // 'import type'이 아닌 일반 import 사용
 
-// CardProps 타입을 PostType 전체를 받도록 하거나, 필요한 필드만 명시할 수 있습니다.
-// 여기서는 PostType 전체를 받는다고 가정하고, 필요한 필드만 구조 분해 할당합니다.
-// type CardProps = PostType; // 이렇게 해도 동일합니다.
+// 레이블 및 스타일 반환 헬퍼 함수
+const getRecruitmentTypeInfo = (
+  category: PostType["category"], // PostType의 category 타입을 직접 사용
+  targetType: PostType["targetType"] // PostType의 targetType 타입을 직접 사용
+): { label: string | null; bgColorClass: string; textColorClass: string } => {
+  if (category === RecruitCategory.MATCH) { // Enum 값을 직접 비교
+    return { label: null, bgColorClass: "", textColorClass: "" };
+  }
 
-const getLabel = (category: PostType["category"], targetType: PostType["targetType"]): string => {
-  if (category === "MATCH") return "[경기 모집]"; // PostType.category는 대문자 Enum 값의 문자열 리터럴 유니온
-  if (category === "TEAM") return "[팀원 모집]"; // PostType.category는 대문자 Enum 값의 문자열 리터럴 유니온
-  if (targetType === "USER") return "[용병(개인) 모집]"; // PostType.targetType은 대문자 Enum 값의 문자열 리터럴 유니온
-  if (targetType === "TEAM") return "[용병(팀) 모집]"; // PostType.targetType은 대문자 Enum 값의 문자열 리터럴 유니온
-  return "[모집]"; // 기본값
+  let label = "";
+  let bgColorClass = "bg-gray-200";
+  let textColorClass = "text-gray-700";
+
+  if (category === RecruitCategory.MERCENARY || category === RecruitCategory.TEAM) {
+    if (targetType === RecruitTargetType.USER) {
+      label = category === RecruitCategory.MERCENARY ? "팀 → 용병(개인)" : "팀 → 팀원";
+      bgColorClass = "bg-blue-100";
+      textColorClass = "text-blue-700";
+    } else if (targetType === RecruitTargetType.TEAM) {
+      label = category === RecruitCategory.MERCENARY ? "용병(개인) → 팀" : "개인 → 팀 합류";
+      bgColorClass = "bg-green-100";
+      textColorClass = "text-green-700";
+    }
+  }
+  return { label, bgColorClass, textColorClass };
 };
 
-const SummaryCard = (props: PostType) => { // props 전체를 PostType으로 받음
+// 상태에 따른 텍스트 및 배경색/뱃지 스타일 반환 헬퍼 함수
+const getStatusStyle = (status: PostType["status"]): { text: string; styleClass: string } => {
+  // PostType의 status가 RecruitStatus Enum 타입이 아니라면, 문자열 값으로 비교
+  // 만약 PostType.status가 RecruitStatus Enum 타입이라면 RecruitStatus.RECRUITING 등으로 직접 비교
+  const statusString = status as string; // 필요시 타입 단언
+
+  switch (statusString) {
+    case RecruitStatus.RECRUITING: // Enum 값을 직접 비교
+      return { text: "모집중", styleClass: "bg-green-500 text-white" };
+    case RecruitStatus.COMPLETED:
+      return { text: "모집완료", styleClass: "bg-blue-500 text-white" };
+    case RecruitStatus.IN_PROGRESS:
+      return { text: "진행/경기중", styleClass: "bg-yellow-500 text-white" };
+    case RecruitStatus.CANCELLED:
+      return { text: "모집취소", styleClass: "bg-red-500 text-white" };
+    case RecruitStatus.FINISHED:
+      return { text: "종료", styleClass: "bg-gray-500 text-white" };
+    default:
+      return { text: statusString, styleClass: "bg-gray-300 text-gray-700" };
+  }
+};
+
+const SummaryCard = (props: PostType) => {
   const {
-    id,
     title,
     category,
-    targetType, // PostType의 targetType 필드 사용 (대문자 T)
+    targetType,
     region,
-    // subRegion, // 필요하다면 subRegion도 표시
-    gameDate,    // PostType의 gameDate 필드 사용
-    gameTime,    // PostType의 gameTime 필드 사용
-    thumbnailUrl,// PostType의 thumbnailUrl 필드 사용 (대문자 U)
-    authorName,  // PostType의 authorName 필드 사용 (또는 authorId를 사용해 작성자 정보를 가져올 수도 있음)
-    status,      // PostType의 status 필드 사용
-    // ... PostType에서 SummaryCard에 표시할 다른 필드들
+    subRegion,
+    gameDate,
+    gameTime,
+    thumbnailUrl,
+    authorName,
+    status,
   } = props;
 
-  // const navigate = useNavigate(); // 카드를 Link로 감싸면 navigate는 여기서 불필요할 수 있음
-  const label = getLabel(category, targetType);
+  const recruitmentTypeInfo = getRecruitmentTypeInfo(category, targetType);
+  const statusInfo = getStatusStyle(status);
 
-  // const handleClick = () => { // 카드를 Link로 감싸면 이 핸들러는 불필요
-  //   // 상세 페이지로 이동하는 로직은 HomeSectionSlider 등 상위 컴포넌트의 Link로 처리
-  // };
-
-  // 날짜와 시간 형식 변환 (예시 - 필요에 따라 라이브러리 사용 또는 형식 변경)
-  const formattedGameDate = gameDate ? new Date(gameDate).toLocaleDateString('ko-KR') : '날짜 미정';
-  const formattedGameTime = gameTime || '시간 미정';
-
+  const formattedDate = gameDate ? gameDate.toString().split("T")[0] : "날짜 미정";
+  const formattedTime = gameTime || "시간 미정";
 
   return (
-    // 이 카드를 Link로 감싸서 클릭 가능하게 만드는 것은 상위 컴포넌트(예: HomeSectionSlider)의 역할
-    <div className="bg-white shadow-md rounded-lg overflow-hidden h-full flex flex-col cursor-pointer transform hover:scale-105 transition-transform duration-200 ease-in-out">
-      {thumbnailUrl ? (
-        <img src={thumbnailUrl} alt={title} className="w-full h-32 object-cover" />
-      ) : (
-        <div className="w-full h-32 bg-gray-200 flex items-center justify-center text-gray-400">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-12 h-12">
-            <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.158 0a.075.075 0 0 1 .15 0A.075.075 0 0 1 12.908 8.25h.008a.075.075 0 0 1 0 .15A.075.075 0 0 1 12.908 8.4h-.008a.075.075 0 0 1-.15 0A.075.075 0 0 1 12.75 8.25h.008Z" />
-          </svg>
+    <div className="bg-white shadow-lg rounded-lg overflow-hidden h-full flex flex-col group cursor-pointer transition-all duration-200 ease-in-out hover:shadow-xl">
+      <div className="relative w-full h-40">
+        {thumbnailUrl ? (
+          <img src={thumbnailUrl} alt={title} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
+        ) : (
+          <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-16 h-16"><path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.158 0a.075.075 0 0 1 .15 0A.075.075 0 0 1 12.908 8.25h.008a.075.075 0 0 1 0 .15A.075.075 0 0 1 12.908 8.4h-.008a.075.075 0 0 1-.15 0A.075.075 0 0 1 12.75 8.25h.008Z" /></svg>
+            <span className="absolute text-xs">No Image</span>
+          </div>
+        )}
+        {recruitmentTypeInfo.label && (
+          <div className={`absolute top-2 left-2 px-2 py-0.5 rounded-full text-xs font-semibold ${recruitmentTypeInfo.bgColorClass} ${recruitmentTypeInfo.textColorClass} shadow`}>
+            {recruitmentTypeInfo.label}
+          </div>
+        )}
+        <div className={`absolute top-2 right-2 px-2 py-0.5 rounded-md text-xs font-semibold ${statusInfo.styleClass} shadow`}>
+          {statusInfo.text}
         </div>
-      )}
+      </div>
       <div className="p-4 flex flex-col flex-grow">
-        <p className="text-xs text-blue-600 font-semibold">{label}</p>
-        <h3 className="text-md font-bold mt-1 mb-2 text-gray-800 truncate group-hover:text-blue-700 transition-colors">
-          {title}
+        <h3 className="text-base font-bold text-gray-800 mb-2 leading-snug group-hover:text-blue-700 transition-colors min-h-[2.5em] line-clamp-2">
+          {title.length > 30 ? `${title.substring(0, 30)}...` : title}
         </h3>
-        <div className="text-xs text-gray-500 mt-auto">
-          <p>지역: {region}{props.subRegion ? ` ${props.subRegion}` : ''}</p>
-          <p>일시: {formattedGameDate} {formattedGameTime}</p>
+        <div className="text-xs text-gray-500 mt-auto space-y-0.5">
+          <p>지역: {region}{subRegion ? ` ${subRegion}` : ''}</p>
+          <p>일시: {formattedDate} {formattedTime}</p>
           {authorName && <p>작성자: {authorName}</p>}
-          <p>상태: <span className={`font-semibold ${status === 'RECRUITING' ? 'text-green-600' : 'text-gray-600'}`}>{status}</span></p>
         </div>
       </div>
     </div>

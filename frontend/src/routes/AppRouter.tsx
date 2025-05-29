@@ -8,6 +8,7 @@ import MatchPage from "@/features/match/pages/MatchPage"; // 새로 만든 Match
 import TeamManagePage from "@/features/team-manage/pages/TeamManagePage";
 import TeamDetailPage from "@/features/team-manage/pages/TeamDetailPage"; // 팀 상세 페이지 (만약 TeamPage와 역할이 다르다면)
 import MyPage from "@/features/mypage/pages/MyPage";
+import MyProfileEditPage from "@/features/mypage/pages/MyProfileEditPage";
 import LoginPage from "@/features/auth/pages/LoginPage";
 import SignupPage from "@/features/auth/pages/SignupPage";
 
@@ -29,6 +30,7 @@ const AppRouter = () => {
           {/* 만약 TeamPage가 목록과 상세보기를 모두 처리한다면 /team/:id 경로는 불필요하거나 TeamPage로 연결 */}
           <Route path="/team/:id" element={<TeamDetailPage />} /> {/* 현재는 유지, 필요시 TeamPage로 변경 가능 */}
           <Route path="/mypage" element={<MyPage />} />
+          <Route path="/mypage/edit" element={<MyProfileEditPage />} /> {/* ✅ 프로필 수정 페이지 라우트 추가 */}
         </Route>
 
         <Route path="/login" element={<LoginPage />} />

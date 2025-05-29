@@ -1,33 +1,41 @@
 // src/types/user.ts
 
 /**
- * 애플리케이션 내에서 사용될 사용자 정보 또는 서버에서 응답으로 받는 사용자 정보 타입.
- * 백엔드 User 엔티티의 필드명과 일치시킵니다.
+ * 서버 응답 또는 앱 내부에서 사용될 사용자 정보 타입.
+ * 백엔드 UserResponseDto.java 와 필드 구조를 일치시킵니다.
  */
-export interface User {
+export interface UserResponseDto { // 백엔드 UserResponseDto와 일치시킬 타입
   id: number;
-  name: string;        // User.java 필드
-  email: string;       // User.java 필드
-  userid: string;      // User.java 필드
-  phoneNumber?: string; // User.java 필드 (phoneNumber)
-  birthDate?: string;   // User.java 필드 (birthDate)
-  region?: string;      // User.java 필드
-  preferredPosition?: string; // User.java 필드
-  isExPlayer?: boolean; // User.java 필드 (isExPlayer)
-  role?: string;        // User.java 필드
-  createdAt?: string;   // User.java 필드 (createdAt)
-  updatedAt?: string;   // User.java 필드 (updatedAt)
-  // User.java 엔티티에 없는 isCaptain, joinedTeams 등은 제거하거나 실제 엔티티/DTO에 맞게 추가
+  name: string;
+  email: string;
+  userid: string; // User.java 및 UserResponseDto.java 기준
+  role?: string;
+  isExPlayer?: boolean;
+  region?: string;
+  preferredPosition?: string;
+  phoneNumber?: string;
+  activityStartDate?: string;
+  activityEndDate?: string;
+  birthDate?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 /**
+ * 기존 User 인터페이스 (UserResponseDto와 동일하게 사용하거나,
+ * 앱 내부 표현에 맞게 필드를 추가/제외할 수 있습니다.)
+ * 여기서는 UserResponseDto와 동일하게 정의합니다.
+ */
+export type User = UserResponseDto;
+
+
+/**
  * 회원가입 요청 시 서버로 전송할 데이터의 구조를 정의하는 타입.
- * 백엔드의 UserSignUpRequestDto.java 와 필드 구조 및 타입이 일치해야 합니다.
  */
 export interface UserSignUpRequestDto {
   name: string;
   email: string;
-  userid: string; // UserSignUpRequestDto.java 필드와 일치
+  userid: string; // 백엔드 UserSignUpRequestDto.java는 'userid'를 사용
   password: string;
   isExPlayer?: boolean;
   region?: string;
@@ -37,11 +45,10 @@ export interface UserSignUpRequestDto {
 
 /**
  * 로그인 요청 DTO.
- * 백엔드 로그인 DTO의 필드명과 일치해야 합니다. (백엔드 AuthController가 UserLoginRequestDto를 받고, 이 DTO에 userid가 있다고 가정)
- * 만약 백엔드 UserLoginRequestDto가 loginId를 사용한다면 loginId: string; 으로 변경해야 합니다.
+ * 백엔드 로그인 DTO는 "loginId" 필드를 기대합니다 (오류 메시지 기반).
  */
 export interface UserLoginRequestDto {
-  userid: string; // 백엔드 로그인 DTO가 userid를 사용한다고 가정
+  loginId: string; // ✅ 백엔드에서 기대하는 필드명
   password: string;
 }
 
@@ -50,7 +57,19 @@ export interface UserLoginRequestDto {
  * 백엔드의 AuthLoginResponseDto.java 구조와 일치시킵니다.
  */
 export interface AuthResponseDto {
-  token: string;        // AuthLoginResponseDto.java의 필드명 'token'과 일치
-  user: User;           // 로그인 후 반환되는 사용자 정보 (UserResponseDto 대신 User 타입 사용 가정)
-                        // 백엔드가 UserResponseDto를 반환한다면, 해당 DTO 타입도 여기에 정의하고 사용
+  token: string; // 백엔드 AuthLoginResponseDto.java의 필드명 'token'
+  user: UserResponseDto; // 로그인 후 반환되는 사용자 정보
+}
+
+export interface UserProfileUpdateDto {
+  name?: string;                 // @Size(max = 50)
+  email?: string;                // @Email, @Size(max = 100)
+  password?: string;             // @Size(max = 255), 보통 별도 API 사용
+  isExPlayer?: boolean;          //
+  region?: string;               //
+  preferredPosition?: string;    //
+  phoneNumber?: string;          // @Size(max = 20)
+  activityStartDate?: string;    // Java의 LocalDate는 string으로
+  activityEndDate?: string;      // Java의 LocalDate는 string으로
+  birthDate?: string;            // Java의 LocalDate는 string으로
 }
