@@ -1,24 +1,40 @@
-// src/features/auth/api/userApi.ts
+// src/features/user/api/userApi.ts (또는 authApi.ts와 통합된 위치)
 
-import axiosInstance from "@/lib/axiosInstance"
-import { User } from "@/types/user"
+import axiosInstance from "@/lib/axiosInstance";
+import type { User, UserProfileUpdateDto, PublicUserProfileResponseDto } from "@/types/user"; // UserProfileUpdateDto 및 PublicUserProfileResponseDto 추가
+
+const API_USERS_BASE_URL = "/api/users";
 
 /**
  * 🔐 내 정보 조회 API (/me)
- * - 로그인된 사용자의 정보를 가져옴
- * - Authorization 헤더에 토큰이 자동 포함되어야 함
  */
-export const getMyProfile = async (): Promise<User> => {
-  const response = await axiosInstance.get("/api/users/me")
-  return response.data as User
-}
+export const getMyProfileApi = async (): Promise<User> => {
+  const response = await axiosInstance.get<User>(`${API_USERS_BASE_URL}/me`);
+  return response.data;
+};
 
 /**
  * ⚙️ 내 정보 수정 API
- * - PUT 또는 PATCH 방식 사용 가능
  * @param updatedData 변경할 유저 정보
  */
-export const updateMyProfile = async (updatedData: Partial<User>): Promise<User> => {
-  const response = await axiosInstance.put("/api/users/me", updatedData)
-  return response.data as User
-}
+export const updateMyProfileApi = async (updatedData: Partial<UserProfileUpdateDto>): Promise<User> => {
+  // UserProfileUpdateDto는 UserProfileUpdateDtoType 대신 사용 (타입 정의 일관성)
+  const response = await axiosInstance.put<User>(`${API_USERS_BASE_URL}/me`, updatedData);
+  return response.data;
+};
+
+/**
+ * 🙋‍♂️ 특정 사용자의 공개 프로필 정보 조회 API
+ * @param userId 조회할 사용자의 ID
+ */
+export const fetchPublicUserProfileApi = async (userId: number | string): Promise<PublicUserProfileResponseDto> => {
+  try {
+    console.log(`[userApi] Fetching public profile for userId: ${userId}`); // API 호출 확인용 로그
+    const response = await axiosInstance.get<PublicUserProfileResponseDto>(`${API_USERS_BASE_URL}/${userId}/profile`);
+    console.log("[userApi] Profile data received:", response.data); // 응답 데이터 확인용 로그
+    return response.data;
+  } catch (error) {
+    console.error(`[userApi] Error fetching public user profile for ID ${userId}:`, error);
+    throw error;
+  }
+};
