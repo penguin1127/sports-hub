@@ -1,6 +1,6 @@
 // src/features/mypage/components/MyProfileForm.tsx
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { getMyProfile, updateMyProfile } from "@/features/auth/api/userApi"; // updateMyProfile 임포트
 import { User } from "@/types/user";

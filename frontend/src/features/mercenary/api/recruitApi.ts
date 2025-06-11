@@ -1,7 +1,7 @@
 // src/features/mercenary/api/recruitApi.ts (또는 recruitApi.ts)
 
 import axiosInstance from "@/lib/axiosInstance"; // axiosInstance 경로 확인
-import { PostType, RecruitCategory, RecruitPostCreationRequestDto } from "@/types/recruitPost";
+import { PostType, RecruitPostCreationRequestDto } from "@/types/recruitPost";
 import { PageResponse } from "@/types/PageResponse";
 
 const API_BASE_URL = "http://localhost:8080/api/recruit-posts";
