@@ -131,8 +131,8 @@ const MercenaryPostModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, initia
   const dateLabel = isTeamToIndividual ? '경기 날짜' : '활동 가능 날짜';
   const timeLabel = isTeamToIndividual ? '경기 시간' : '활동 가능 시간';
   const positionLabel = isTeamToIndividual ? '모집 포지션' : '선호 포지션';
-  const modalTitle = initialData ? "✏️ 모집 글 수정" : "✏️ 용병 모집 글 작성";
-  const submitButtonText = initialData ? "수정하기" : "등록하기";
+  //const modalTitle = initialData ? "✏️ 모집 글 수정" : "✏️ 용병 모집 글 작성";
+  //const submitButtonText = initialData ? "수정하기" : "등록하기";
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="✏️ 용병 모집 글 작성">

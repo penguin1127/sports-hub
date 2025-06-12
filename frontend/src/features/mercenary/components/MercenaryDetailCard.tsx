@@ -3,7 +3,7 @@
 import React from 'react'; // React 임포트
 import type { PostType } from "@/types/recruitPost"; // PostType은 타입으로만 사용될 수 있음
 // Enum을 값으로 사용하므로 일반 import로 변경
-import { RecruitCategory, RecruitTargetType, RecruitStatus } from "@/types/recruitPost";
+import {  RecruitStatus } from "@/types/recruitPost";
 
 // Props 타입 정의
 interface MercenaryDetailCardProps {

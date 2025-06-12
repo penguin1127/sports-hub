@@ -2,6 +2,7 @@
 package com.example.backend.controller;
 
 // UserSignUpRequestDto는 AuthController로 이동했으므로 여기서 제거
+import com.example.backend.dto.team.TeamSummaryResponseDto;
 import com.example.backend.dto.user.UserProfileUpdateDto;
 import com.example.backend.dto.user.UserResponseDto;
 import com.example.backend.dto.user.PublicUserProfileResponseDto; // ✅ 추가: 공개 프로필 DTO 임포트
@@ -70,5 +71,14 @@ public class UserController {
 
         userService.deleteUserByUserId(currentUserId);
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * 특정 사용자의 소속팀 목록 조회
+     */
+    @GetMapping("/{userId}/teams")
+    public ResponseEntity<List<TeamSummaryResponseDto>> getUserTeams(@PathVariable Long userId) {
+        List<TeamSummaryResponseDto> userTeams = userService.getUserTeams(userId);
+        return ResponseEntity.ok(userTeams);
     }
 }

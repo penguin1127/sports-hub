@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { getMyProfile, updateMyProfile } from "@/features/auth/api/userApi"; // updateMyProfile 임포트
+import { getMyProfileApi, updateMyProfileApi } from "@/features/auth/api/userApi"; // updateMyProfile 임포트
 import { User } from "@/types/user";
 
 const MyProfileForm = () => {

@@ -2,6 +2,7 @@
 
 import axiosInstance from "@/lib/axiosInstance";
 import type { User, UserProfileUpdateDto, PublicUserProfileResponseDto } from "@/types/user"; // UserProfileUpdateDto 및 PublicUserProfileResponseDto 추가
+import type { TeamSummary } from "@/types/team";
 
 const API_USERS_BASE_URL = "/api/users";
 
@@ -35,6 +36,20 @@ export const fetchPublicUserProfileApi = async (userId: number | string): Promis
     return response.data;
   } catch (error) {
     console.error(`[userApi] Error fetching public user profile for ID ${userId}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * 특정 사용자의 소속팀 목록 조회 API
+ * @param userId 조회할 사용자의 ID
+ */
+export const getUserTeamsApi = async (userId: number | string): Promise<TeamSummary[]> => {
+  try {
+    const response = await axiosInstance.get<TeamSummary[]>(`/api/users/${userId}/teams`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching teams for user ID ${userId}:`, error);
     throw error;
   }
 };
