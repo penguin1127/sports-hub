@@ -3,6 +3,7 @@
 import axiosInstance from "@/lib/axiosInstance";
 import type { User, UserProfileUpdateDto, PublicUserProfileResponseDto } from "@/types/user"; // UserProfileUpdateDto 및 PublicUserProfileResponseDto 추가
 import type { TeamSummary } from "@/types/team";
+import { PostType } from "@/types/recruitPost";
 
 const API_USERS_BASE_URL = "/api/users";
 
@@ -50,6 +51,20 @@ export const getUserTeamsApi = async (userId: number | string): Promise<TeamSumm
     return response.data;
   } catch (error) {
     console.error(`Error fetching teams for user ID ${userId}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * 특정 사용자의 작성글 목록 조회 API
+ * @param userId 조회할 사용자의 ID
+ */
+export const getUserPostsApi = async (userId: number | string): Promise<PostType[]> => {
+  try {
+    const response = await axiosInstance.get<PostType[]>(`/api/users/${userId}/posts`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching posts for user ID ${userId}:`, error);
     throw error;
   }
 };

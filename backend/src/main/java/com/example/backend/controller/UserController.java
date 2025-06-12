@@ -2,6 +2,7 @@
 package com.example.backend.controller;
 
 // UserSignUpRequestDto는 AuthController로 이동했으므로 여기서 제거
+import com.example.backend.dto.auth.RecruitPostResponseDto;
 import com.example.backend.dto.team.TeamSummaryResponseDto;
 import com.example.backend.dto.user.UserProfileUpdateDto;
 import com.example.backend.dto.user.UserResponseDto;
@@ -80,5 +81,14 @@ public class UserController {
     public ResponseEntity<List<TeamSummaryResponseDto>> getUserTeams(@PathVariable Long userId) {
         List<TeamSummaryResponseDto> userTeams = userService.getUserTeams(userId);
         return ResponseEntity.ok(userTeams);
+    }
+
+    /**
+     * 특정 사용자가 작성한 게시글 목록 조회
+     */
+    @GetMapping("/{userId}/posts")
+    public ResponseEntity<List<RecruitPostResponseDto>> getUserPosts(@PathVariable Long userId) {
+        List<RecruitPostResponseDto> userPosts = userService.getUserPosts(userId);
+        return ResponseEntity.ok(userPosts);
     }
 }

@@ -1,9 +1,12 @@
 // src/main/java/com/example/backend/service/UserService.java
 package com.example.backend.service;
 
+import com.example.backend.dto.auth.RecruitPostResponseDto;
 import com.example.backend.dto.team.TeamSummaryResponseDto;
+import com.example.backend.entity.RecruitPost;
 import com.example.backend.entity.User;
 import com.example.backend.entity.UserTeam;
+import com.example.backend.repository.RecruitPostRepository;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.dto.user.UserSignUpRequestDto;
 import com.example.backend.dto.user.UserProfileUpdateDto;
@@ -30,6 +33,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserTeamRepository userTeamRepository;
+    private final RecruitPostRepository recruitPostRepository;
     // 1. 회원가입
     public UserResponseDto signUp(UserSignUpRequestDto signUpDto) {
         if (userRepository.existsByEmail(signUpDto.getEmail())) {
@@ -172,5 +176,57 @@ public class UserService {
         return userTeams.stream()
                 .map(TeamSummaryResponseDto::fromEntity)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 특정 사용자가 작성한 게시글 목록 조회
+     */
+    /**
+     * 특정 사용자가 작성한 게시글 목록 조회 (수정된 버전)
+     */
+    @Transactional(readOnly = true)
+    public List<RecruitPostResponseDto> getUserPosts(Long userId) {
+        List<RecruitPost> posts = recruitPostRepository.findByAuthorIdOrderByCreatedAtDesc(userId);
+
+        // ▼▼▼ 복사해온 convertToDto 메소드를 사용하도록 수정합니다. ▼▼▼
+        return posts.stream()
+                .map(this::convertToDto) // this::convertToDto 로 변경
+                .collect(Collectors.toList());
+    }
+
+    // ▼▼▼ RecruitPostService에서 복사해온 convertToDto 메소드 ▼▼▼
+    private RecruitPostResponseDto convertToDto(RecruitPost recruitPost) {
+        Long authorId = null;
+        String authorName = null;
+        if (recruitPost.getAuthor() != null) {
+            authorId = recruitPost.getAuthor().getId();
+            authorName = recruitPost.getAuthor().getName();
+        }
+
+        return RecruitPostResponseDto.builder()
+                .id(recruitPost.getId())
+                .title(recruitPost.getTitle())
+                .content(recruitPost.getContent())
+                .region(recruitPost.getRegion())
+                .subRegion(recruitPost.getSubRegion())
+                .thumbnailUrl(recruitPost.getThumbnailUrl())
+                .category(recruitPost.getCategory()) // ◀ 이 필드가 중요합니다.
+                .targetType(recruitPost.getTargetType())
+                .fromParticipant(recruitPost.getFromParticipant())
+                .toParticipant(recruitPost.getToParticipant())
+                .gameDate(recruitPost.getGameDate())
+                .gameTime(recruitPost.getGameTime())
+                .status(recruitPost.getStatus())
+                .requiredPersonnel(recruitPost.getRequiredPersonnel())
+                .ageGroup(recruitPost.getAgeGroup())
+                .preferredPositions(recruitPost.getPreferredPositions())
+                .matchRules(recruitPost.getMatchRules())
+                .minPlayers(recruitPost.getMinPlayers())
+                .maxPlayers(recruitPost.getMaxPlayers())
+                .authorId(authorId)
+                .authorName(authorName)
+                .createdAt(recruitPost.getCreatedAt())
+                .updatedAt(recruitPost.getUpdatedAt())
+                .build();
     }
 }
