@@ -1,7 +1,8 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.auth.RecruitPostCreationRequest;
-import com.example.backend.entity.RecruitPost;
+
+import com.example.backend.dto.auth.RecruitPostUpdateRequest;
 import com.example.backend.service.RecruitPostService;
 import com.example.backend.dto.auth.RecruitPostResponseDto;
 import com.example.backend.enums.RecruitCategory; // RecruitCategory enum import
@@ -63,12 +64,16 @@ public class RecruitPostController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(createdPost); // ◀ 201 Created 상태 코드 반환
     }
-    /**
-     * 모집글 삭제
+    /*
+     * 모집글 삭제 (권한 확인 로직 추가 버전)
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePost(@PathVariable Long id) {
-        recruitPostService.deletePost(id);
+    public ResponseEntity<Void> deletePost(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        // 로그인한 사용자 ID를 서비스로 전달
+        recruitPostService.deletePost(id, userDetails.getUsername());
         return ResponseEntity.noContent().build();
     }
 
@@ -83,6 +88,16 @@ public class RecruitPostController {
         return ResponseEntity.ok().body(recruitPostService.getPostsByCategory(category, pageable));
     }
 
+    /**
+     * 모집글 수정
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<RecruitPostResponseDto> updatePost(
+            @PathVariable Long id,
+            @RequestBody RecruitPostUpdateRequest requestDto,
+            @AuthenticationPrincipal UserDetails userDetails) {
 
-    // 다른 필터링/검색 엔드포인트도 필요하다면 유사하게 추가할 수 있습니다.
+        RecruitPostResponseDto updatedPost = recruitPostService.updatePost(id, requestDto, userDetails.getUsername());
+        return ResponseEntity.ok(updatedPost);
+    }
 }

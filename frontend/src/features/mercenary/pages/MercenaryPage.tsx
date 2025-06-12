@@ -1,7 +1,7 @@
 // src/features/mercenary/pages/MercenaryPage.tsx
 
-import React, { useEffect, useState, useMemo } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useEffect, useState, useMemo, } from "react";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useRecruitStore } from "@/stores/useRecruitStore";
 import { 
@@ -9,9 +9,8 @@ import {
   RecruitCategory, 
   PostType 
 } from "@/types/recruitPost";
-import { createRecruitPostApi } from "../api/recruitApi";
+import { createRecruitPostApi, updateRecruitPostApi, deleteRecruitPostApi } from "../api/recruitApi";
 
-// ▼▼▼ 우리가 만든 컴포넌트들을 임포트합니다. ▼▼▼
 import MercenaryPostModal from "../components/MercenaryPostModal"; 
 import MercenaryDetailCard from "../components/MercenaryDetailCard";
 import RegionSelectTrigger from "@/components/common/RegionSelectTrigger";
@@ -22,21 +21,22 @@ import UserProfileModal from "@/components/common/UserProfileModal";
 const MercenaryPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   
   const user = useAuthStore((s) => s.user);
   const allPostsFromStore = useRecruitStore((s) => s.posts);
   const loadPosts = useRecruitStore((s) => s.loadPosts);
-  const removePost = useRecruitStore((s) => s.removePost);
 
   const focusedId = useMemo(() => new URLSearchParams(location.search).get("id"), [location.search]);
 
-  const [isNewPostModalOpen, setIsNewPostModalOpen] = useState(false);
+  // 모달 관련 상태를 하나로 통합하고 명확하게 관리. 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingPost, setEditingPost] = useState<PostType | null>(null);
+  
   const [isLoading, setIsLoading] = useState(true);
-
   const [search, setSearch] = useState("");
   const [selectedRegion, setSelectedRegion] = useState("전체 지역");
   const [isRegionModalOpen, setIsRegionModalOpen] = useState(false);
-
   const [selectedUserIdForProfile, setSelectedUserIdForProfile] = useState<number | string | null>(null);
 
   useEffect(() => {
@@ -53,51 +53,77 @@ const MercenaryPage = () => {
     fetchPosts();
   }, [loadPosts]);
 
+  useEffect(() => {
+    if (searchParams.get('action') === 'create' && user) {
+      handleOpenCreateModal();
+      searchParams.delete('action');
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, user]);
+
   const filteredPosts = useMemo(() => { 
     if (!allPostsFromStore) return [];
     let postsToFilter = allPostsFromStore;
     
     if (search) {
-      postsToFilter = postsToFilter.filter((p) => {
-        const titleMatch = p.title.toLowerCase().includes(search.toLowerCase());
-        const regionMatchInMain = p.region.toLowerCase().includes(search.toLowerCase());
-        const subRegionMatch = p.subRegion ? p.subRegion.toLowerCase().includes(search.toLowerCase()) : false;
-        return titleMatch || regionMatchInMain || subRegionMatch;
-      });
+      postsToFilter = postsToFilter.filter((p) => p.title.toLowerCase().includes(search.toLowerCase()));
     }
-
     if (selectedRegion !== "전체 지역") {
-      postsToFilter = postsToFilter.filter((p) => 
-        p.region === selectedRegion || (p.subRegion && p.subRegion.includes(selectedRegion))
-      );
+      postsToFilter = postsToFilter.filter((p) => p.region === selectedRegion);
     }
     return postsToFilter;
   }, [allPostsFromStore, search, selectedRegion]);
 
-  // 'handleCreate' 함수는 모달로부터 최종 데이터를 받아 API 호출을 담당합니다.
-  const handleCreate = async (postData: RecruitPostCreationRequestDto) => {
-    try {
-      await createRecruitPostApi(postData);
-      alert("게시글이 성공적으로 등록되었습니다.");
-      setIsNewPostModalOpen(false); // 모달 닫기
-      await loadPosts(RecruitCategory.MERCENARY); // 목록 새로고침
-    } catch (error) {
-      console.error("게시글 생성 실패:", error);
-      alert("게시글 등록 중 오류가 발생했습니다.");
-    }
+  // '생성/수정/닫기' 관련 핸들러 함수들을 정리. 
+
+  const handleOpenCreateModal = () => {
+    setEditingPost(null);
+    setIsModalOpen(true);
+  };
+  
+  const handleOpenEditModal = (post: PostType) => {
+    setEditingPost(post);
+    setIsModalOpen(true);
   };
 
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingPost(null);
+  };
+
+  // 생성과 수정을 모두 처리하는 통합 핸들러 'handleSavePost'
+  const handleSavePost = async (formData: RecruitPostCreationRequestDto) => {
+    try {
+      if (editingPost) {
+        // 수정 모드
+        await updateRecruitPostApi(editingPost.id, formData);
+        alert("게시글이 성공적으로 수정되었습니다.");
+      } else {
+        // 생성 모드
+        await createRecruitPostApi(formData);
+        alert("게시글이 성공적으로 등록되었습니다.");
+      }
+      handleCloseModal();
+      await loadPosts(RecruitCategory.MERCENARY);
+    } catch (error) {
+      alert("처리 중 오류가 발생했습니다.");
+      console.error("Save post failed:", error);
+    }
+  };
+  
   const handleDelete = async (postId: number) => {
     if (window.confirm("정말 삭제하시겠습니까?")) {
-      try {
-        await removePost(postId);
-        if (String(postId) === focusedId) {
-          navigate("/mercenary", { replace: true });
+        try {
+            await deleteRecruitPostApi(postId);
+            alert("게시글이 삭제되었습니다.");
+            if (String(postId) === focusedId) {
+                navigate("/mercenary", { replace: true });
+            }
+            await loadPosts(RecruitCategory.MERCENARY);
+        } catch (error) {
+            console.error("Error deleting post:", error);
+            alert("삭제 중 오류가 발생했습니다.");
         }
-      } catch (error) {
-        console.error("Error deleting post:", error);
-        alert("삭제 중 오류가 발생했습니다.");
-      }
     }
   };
 
@@ -113,14 +139,9 @@ const MercenaryPage = () => {
   }, [filteredPosts, focusedId]);
 
   const handleExpand = (postId: string | number) => navigate(`/mercenary?id=${postId}`);
-  const handleClose = () => navigate("/mercenary", { replace: true });
-
-  const openUserProfileModal = (userId: number | string) => {
-    setSelectedUserIdForProfile(userId);
-  };
-  const closeUserProfileModal = () => {
-    setSelectedUserIdForProfile(null);
-  };
+  const handleCloseDetail = () => navigate("/mercenary", { replace: true });
+  const openUserProfileModal = (userId: number | string) => setSelectedUserIdForProfile(userId);
+  const closeUserProfileModal = () => setSelectedUserIdForProfile(null);
 
   if (isLoading && allPostsFromStore.length === 0) {
     return <div className="text-center py-20 pt-24">용병 목록을 불러오는 중입니다...</div>;
@@ -132,7 +153,7 @@ const MercenaryPage = () => {
         <h1 className="text-3xl font-bold text-center sm:text-left">🔥 용병 목록</h1>
         {user && (
           <button
-            onClick={() => setIsNewPostModalOpen(true)}
+            onClick={handleOpenCreateModal}
             className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors w-full sm:w-auto"
           >
             ✏️ 용병 모집 글쓰기
@@ -140,13 +161,13 @@ const MercenaryPage = () => {
         )}
       </div>
 
-      {/* ▼▼▼ 새로 만든 MercenaryPostModal을 여기서 호출합니다. ▼▼▼ */}
+      {/* ▼▼▼ 모달 호출부를 수정된 상태와 핸들러에 맞게 정리합니다. ▼▼▼ */}
       <MercenaryPostModal
-        isOpen={isNewPostModalOpen}
-        onClose={() => setIsNewPostModalOpen(false)}
-        onSubmit={handleCreate}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onSubmit={handleSavePost}
+        initialData={editingPost}
       />
-      {/* ▲▲▲ category prop은 이제 모달이 직접 관리하므로 넘겨줄 필요 없습니다. ▲▲▲ */}
 
       <div className="mb-6 p-4 bg-gray-50 rounded-lg shadow">
         <div className="flex flex-wrap items-center gap-2 sm:gap-4">
@@ -171,13 +192,17 @@ const MercenaryPage = () => {
               post={post}
               isExpanded={String(post.id) === focusedId}
               onExpand={() => handleExpand(post.id)}
-              onClose={handleClose}
-              onDelete={
-                user && user.id && post.authorId && user.id === post.authorId
-                  ? () => handleDelete(post.id)
-                  : undefined
-              }
-              onAuthorNameClick={post.authorId !== null ? () => openUserProfileModal(post.authorId!) : undefined}
+              onClose={handleCloseDetail}
+              // ▼▼▼ 여기에 누락되었던 onEdit prop을 추가합니다. ▼▼▼
+              onEdit={user?.id === post.authorId ? () => handleOpenEditModal(post) : undefined}
+              onDelete={user?.id === post.authorId ? () => handleDelete(post.id) : undefined}
+              onAuthorNameClick={() => {
+              // 함수가 실행되는 시점에 post.authorId가 null이 아닌지 확인합니다.
+              if (post.authorId !== null) {
+              // 이 if 블록 안에서는 post.authorId가 number 타입임이 보장됩니다.
+              openUserProfileModal(post.authorId);
+                }
+              }}
             />
           ))}
         </div>

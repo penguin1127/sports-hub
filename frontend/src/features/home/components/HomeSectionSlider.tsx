@@ -3,6 +3,7 @@ import { useRef, useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { PostType, RecruitCategory } from "@/types/recruitPost"; // RecruitCategory Enum 임포트
 import SummaryCard from "@/components/common/SummaryCard";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 type Props = {
   title: string;
@@ -19,6 +20,8 @@ const categoryEnumToPathString = (categoryEnum: RecruitCategory): string => {
 const HomeSectionSlider = ({ title, category, posts, basePath }: Props) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const { user } = useAuthStore();
+
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
 
@@ -58,14 +61,26 @@ const HomeSectionSlider = ({ title, category, posts, basePath }: Props) => {
       <div className="flex justify-between items-center">
         <h2
           className="text-2xl font-bold cursor-pointer hover:underline"
-          onClick={() => navigate(categoryPagePath)} // 소문자 경로로 이동
+          onClick={() => navigate(categoryPagePath)}
         >
           {title}
         </h2>
         {posts && posts.length > 0 && (
-          <Link to={categoryPagePath} className="text-sm text-blue-600 hover:underline"> {/* 소문자 경로로 이동 */}
-            더보기
-          </Link>
+          // ▼▼▼ 3. '글쓰기'와 '더보기' 버튼을 함께 묶어줍니다. ▼▼▼
+          <div className="flex items-center space-x-4">
+            {/* 로그인한 사용자에게만 '글쓰기' 버튼이 보입니다. */}
+            {user && (
+              <Link 
+                to={`${basePath}?action=create`} 
+                className="text-sm bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600 transition-colors"
+              >
+                + 글쓰기
+              </Link>
+            )}
+            <Link to={categoryPagePath} className="text-sm text-blue-600 hover:underline">
+              더보기
+            </Link>
+          </div>
         )}
       </div>
 

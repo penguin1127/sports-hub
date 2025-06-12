@@ -3,6 +3,7 @@
 import axiosInstance from "@/lib/axiosInstance"; // axiosInstance 경로 확인
 import { PostType, RecruitPostCreationRequestDto,RecruitPostResponseDto } from "@/types/recruitPost";
 import { PageResponse } from "@/types/PageResponse";
+import { RecruitPostUpdateRequestDto } from "@/types/recruitPost";
 
 const API_BASE_URL = "http://localhost:8080/api/recruit-posts";
 
@@ -36,6 +37,40 @@ export const createRecruitPostApi = async (
   } catch (error) {
     console.error("Error creating recruit post:", error);
     // 에러를 그대로 던져서 호출한 쪽에서 처리하도록 합니다.
+    throw error;
+  }
+};
+
+/**
+ * 게시글 삭제 API
+ * @param postId 삭제할 게시글의 ID
+ */
+export const deleteRecruitPostApi = async (postId: number): Promise<void> => {
+  try {
+    await axiosInstance.delete(`/api/recruit-posts/${postId}`);
+  } catch (error) {
+    console.error(`Error deleting post with ID ${postId}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * 특정 모집 게시글 수정 API
+ * @param postId 수정할 게시글의 ID
+ * @param updateData 수정할 내용
+ */
+export const updateRecruitPostApi = async (
+  postId: number,
+  updateData: RecruitPostUpdateRequestDto
+): Promise<RecruitPostResponseDto> => {
+  try {
+    const response = await axiosInstance.put<RecruitPostResponseDto>(
+      `/api/recruit-posts/${postId}`,
+      updateData
+    );
+    return response.data;
+  } catch (error) {
+    console.error(`Error updating post with ID ${postId}:`, error);
     throw error;
   }
 };

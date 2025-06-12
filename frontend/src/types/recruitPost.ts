@@ -70,10 +70,6 @@ export interface RecruitPostCreationRequestDto {
   ageGroup?: string;
   preferredPositions?: string;
   thumbnailUrl?: string;
-  // requiredPersonnel: String; // 백엔드 DTO가 String 이라면 String, Integer면 number
-  // 이전 RecruitPostCreationRequest.java는 String requiredPersonnel 이었음.
-  // 일관성을 위해 백엔드 DTO의 requiredPersonnel을 Integer로 변경하는 것을 권장.
-  // 여기서는 백엔드 DTO가 Integer requiredPersonnel; 로 수정되었다고 가정.
   requiredPersonnel?: number;
   targetType: RecruitTargetType; // Enum 값 전송
   fromParticipant: ParticipantType; // Enum 값 전송
@@ -110,3 +106,7 @@ export interface RecruitPostResponseDto {
   createdAt: string; // "YYYY-MM-DDTHH:mm:ss" 형식의 ISO 문자열
   updatedAt: string;
 }
+
+
+export type RecruitPostUpdateRequestDto = Partial<RecruitPostCreationRequestDto>;
+
