@@ -68,7 +68,7 @@ public class WebSecurityConfig {
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/teams/{teamId}").permitAll() // 특정 팀 상세 조회 (GET 요청)
 
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/users/{userId}/profile").permitAll() // 다른 사용자 공개 프로필 조회
-                        
+
                         .requestMatchers("/api/recruit-posts/**").permitAll() // 기존 RecruitPost API 유지
                         // 특정 역할만 접근 허용하는 경로 (예시, 필요에 따라 추가)
                         // .requestMatchers("/api/admin/**").hasRole("ADMIN") // ADMIN 권한만 접근 가능

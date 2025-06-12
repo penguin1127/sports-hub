@@ -1,15 +1,18 @@
 package com.example.backend.service;
 
+import com.example.backend.dto.auth.RecruitPostCreationRequest;
 import com.example.backend.entity.RecruitPost;
 import com.example.backend.entity.User; // User 엔티티를 사용할 경우 필요
 import com.example.backend.repository.RecruitPostRepository;
 import com.example.backend.dto.auth.RecruitPostResponseDto; // DTO import 경로 (recruit 패키지 안에 있다면)
 import com.example.backend.enums.RecruitCategory; // RecruitCategory enum import
 import com.example.backend.enums.RecruitStatus;   // RecruitStatus enum import (필요하다면)
+import com.example.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page; // Page import
 import org.springframework.data.domain.Pageable; // Pageable import
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate; // LocalDate import (필요하다면)
 import java.util.List;
@@ -23,6 +26,7 @@ import java.util.stream.Collectors;
 public class RecruitPostService {
 
     private final RecruitPostRepository recruitPostRepository;
+    private final UserRepository userRepository;
 
     /**
      * 전체 모집글 조회
@@ -163,5 +167,41 @@ public class RecruitPostService {
                 .createdAt(recruitPost.getCreatedAt())
                 .updatedAt(recruitPost.getUpdatedAt())
                 .build();
+    }
+
+    @Transactional // ◀ 데이터 변경이 있으므로 트랜잭션 처리
+    public RecruitPostResponseDto createPost(RecruitPostCreationRequest requestDto, String currentLoginId) {
+        // 1. 작성자 정보 조회
+        User author = userRepository.findByUserid(currentLoginId) // ◀ 로그인 ID로 사용자 조회
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다: " + currentLoginId));
+
+        // 2. DTO를 RecruitPost 엔티티로 변환
+        RecruitPost newPost = RecruitPost.builder()
+                .author(author) // ◀ 조회한 사용자를 작성자로 설정
+                .title(requestDto.getTitle())
+                .content(requestDto.getContent())
+                .region(requestDto.getRegion())
+                .subRegion(requestDto.getSubRegion())
+                .category(requestDto.getCategory())
+                .targetType(requestDto.getTargetType())
+                .fromParticipant(requestDto.getFromParticipant())
+                .toParticipant(requestDto.getToParticipant())
+                .gameDate(requestDto.getGameDate())
+                .gameTime(requestDto.getGameTime())
+                .status(RecruitStatus.RECRUITING) // ◀ 초기 상태를 '모집중'으로 설정
+                .requiredPersonnel(requestDto.getRequiredPersonnel())
+                .ageGroup(requestDto.getAgeGroup())
+                .preferredPositions(requestDto.getPreferredPositions())
+                .matchRules(requestDto.getMatchRules())
+                .minPlayers(requestDto.getMinPlayers())
+                .maxPlayers(requestDto.getMaxPlayers())
+                .thumbnailUrl(requestDto.getThumbnailUrl())
+                .build();
+
+        // 3. DB에 저장
+        RecruitPost savedPost = recruitPostRepository.save(newPost);
+
+        // 4. 저장된 엔티티를 DTO로 변환하여 반환
+        return convertToDto(savedPost);
     }
 }

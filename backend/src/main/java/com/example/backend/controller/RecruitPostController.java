@@ -1,5 +1,6 @@
 package com.example.backend.controller;
 
+import com.example.backend.dto.auth.RecruitPostCreationRequest;
 import com.example.backend.entity.RecruitPost;
 import com.example.backend.service.RecruitPostService;
 import com.example.backend.dto.auth.RecruitPostResponseDto;
@@ -7,7 +8,10 @@ import com.example.backend.enums.RecruitCategory; // RecruitCategory enum import
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page; // Page import
 import org.springframework.data.domain.Pageable; // Pageable import
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -42,13 +46,23 @@ public class RecruitPostController {
     }
 
     /**
-     * 모집글 생성
+     * 모집글 생성 (수정된 버전)
      */
     @PostMapping
-    public ResponseEntity<RecruitPostResponseDto> createPost(@RequestBody RecruitPost recruitPost) {
-        return ResponseEntity.ok().body(recruitPostService.createPost(recruitPost));
-    }
+    public ResponseEntity<RecruitPostResponseDto> createPost(
+            @RequestBody RecruitPostCreationRequest requestDto,
+            @AuthenticationPrincipal UserDetails userDetails) { // ◀ 로그인한 사용자 정보 자동 주입
 
+        // userDetails가 null이면 JWT 필터에서 이미 차단되지만, 안전을 위해 확인
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        String currentLoginId = userDetails.getUsername();
+        RecruitPostResponseDto createdPost = recruitPostService.createPost(requestDto, currentLoginId);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdPost); // ◀ 201 Created 상태 코드 반환
+    }
     /**
      * 모집글 삭제
      */
@@ -68,6 +82,7 @@ public class RecruitPostController {
             Pageable pageable) { // 페이징 정보는 Pageable 객체로 자동 바인딩
         return ResponseEntity.ok().body(recruitPostService.getPostsByCategory(category, pageable));
     }
+
 
     // 다른 필터링/검색 엔드포인트도 필요하다면 유사하게 추가할 수 있습니다.
 }
