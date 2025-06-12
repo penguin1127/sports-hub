@@ -3,10 +3,13 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import HomePage from "@/features/home/pages/HomePage";
 import MercenaryPage from "@/features/mercenary/pages/MercenaryPage";
+import MercenaryApplyPage from "@/features/mercenary/pages/MercenaryApplyPage.tsx";
 import TeamPage from "@/features/team/pages/TeamPage"; // 새로 만든 TeamPage 임포트
 import MatchPage from "@/features/match/pages/MatchPage"; // 새로 만든 MatchPage 임포트
+
 import TeamManagePage from "@/features/team-manage/pages/TeamManagePage";
 import TeamDetailPage from "@/features/team-manage/pages/TeamDetailPage"; // 팀 상세 페이지 (만약 TeamPage와 역할이 다르다면)
+
 import MyPage from "@/features/mypage/pages/MyPage";
 import MyProfileEditPage from "@/features/mypage/pages/MyProfileEditPage";
 import LoginPage from "@/features/auth/pages/LoginPage";
@@ -23,6 +26,7 @@ const AppRouter = () => {
         <Route element={<Layout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/mercenary" element={<MercenaryPage />} />
+          <Route path= "/mercenary/mercenary-application" element={<MercenaryApplyPage />} /> {/* 용병 신청하는 페이지 추가*/}
           <Route path="/team" element={<TeamPage />} /> {/* TeamPage로 교체 */}
           <Route path="/match" element={<MatchPage />} /> {/* MatchPage로 교체 */}
           <Route path="/team-manage" element={<TeamManagePage />} />

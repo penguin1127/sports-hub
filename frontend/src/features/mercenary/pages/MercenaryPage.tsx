@@ -10,6 +10,7 @@ import NewPostModal from "../components/NewPostModal";
 import RegionSelectTrigger from "@/components/common/RegionSelectTrigger";
 import RegionSelectModal from "@/components/common/RegionSelectModal";
 import UserProfileModal from "@/components/common/UserProfileModal";
+import RecruitApi from  "@/features/mercenary/api/recruitApi.ts";
 
 const MercenaryPage = () => {
   const location = useLocation();
@@ -67,7 +68,7 @@ const MercenaryPage = () => {
     return postsToFilter;
   }, [allPostsFromStore, search, selectedRegion]);
 
-  const handleCreate = (post: PostType) => {
+  const handleCreate = (post: PostType) => { // 버튼을 클릭하였을 때 핸들러 생성
     createPost(post);
     loadPosts(RecruitCategory.MERCENARY);
     setIsNewPostModalOpen(false);
@@ -118,7 +119,7 @@ const MercenaryPage = () => {
         <h1 className="text-3xl font-bold text-center sm:text-left">🔥 용병 목록</h1>
         {user && (
           <button
-            onClick={() => setIsNewPostModalOpen(true)}
+            onClick={() => setIsNewPostModalOpen(true)} // 용병 모집 글쓰기를 클릭하였을 때
             className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors w-full sm:w-auto"
           >
             ✏️ 용병 모집 글쓰기
