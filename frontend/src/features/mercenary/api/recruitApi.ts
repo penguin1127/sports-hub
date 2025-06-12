@@ -1,7 +1,7 @@
 // src/features/mercenary/api/recruitApi.ts (또는 recruitApi.ts)
 
 import axiosInstance from "@/lib/axiosInstance"; // axiosInstance 경로 확인
-import { PostType, RecruitPostCreationRequestDto } from "@/types/recruitPost";
+import { PostType, RecruitPostCreationRequestDto,RecruitPostResponseDto } from "@/types/recruitPost";
 import { PageResponse } from "@/types/PageResponse";
 
 const API_BASE_URL = "http://localhost:8080/api/recruit-posts";
@@ -18,31 +18,24 @@ export const fetchRecruitPosts = async (category: string, page: number = 0, size
   }
 };
 
-// ... (fetchAllRecruitPosts 함수는 필요시 유지) ...
-
 /**
  * 새로운 모집 게시글 생성 API 호출 함수
  * @param postData 생성할 게시글 데이터 (RecruitPostCreationRequestDto 타입)
  * @returns 생성된 게시글 정보 (PostType 또는 RecruitPostResponseDto 타입)
  */
-export const createRecruitPostApi = async (postData: RecruitPostCreationRequestDto): Promise<PostType> => {
+export const createRecruitPostApi = async (
+  postData: RecruitPostCreationRequestDto
+): Promise<RecruitPostResponseDto> => {
   try {
-    // 백엔드 Controller의 @PostMapping이 받는 타입이 RecruitPost 엔티티이므로,
-    // 프론트에서 보내는 DTO와 필드가 최대한 유사해야 하며,
-    // 백엔드에서 이 DTO를 RecruitPost 엔티티로 변환하여 저장해야 합니다.
-    // 현재 RecruitPostController는 @RequestBody RecruitPost recruitPost로 받고 있으므로,
-    // 이 DTO는 RecruitPost 엔티티의 필드와 거의 일치해야 합니다.
-    // (authorId 대신 author 객체를 보내거나, 백엔드에서 authorId로 User를 찾아 설정)
-    // 여기서는 RecruitPostCreationRequestDto를 보내고 백엔드에서 처리한다고 가정합니다.
-    console.log("[recruitApi] Creating post with data:", JSON.stringify(postData, null, 2));
-    const response = await axiosInstance.post<PostType>(`${API_BASE_URL}`, postData, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
+    // 백엔드의 POST /api/recruit-posts 엔드포인트를 호출합니다.
+    const response = await axiosInstance.post<RecruitPostResponseDto>(
+      "/api/recruit-posts",
+      postData
+    );
     return response.data;
   } catch (error) {
     console.error("Error creating recruit post:", error);
+    // 에러를 그대로 던져서 호출한 쪽에서 처리하도록 합니다.
     throw error;
   }
 };

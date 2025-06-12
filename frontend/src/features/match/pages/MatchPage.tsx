@@ -6,7 +6,7 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { useRecruitStore } from "@/stores/useRecruitStore";
 import { PostType, RecruitCategory } from "@/types/recruitPost";
 import MercenaryDetailCard from "@/features/mercenary/components/MercenaryDetailCard"; // 또는 MatchDetailCard
-import NewPostModal from "@/features/mercenary/components/NewPostModal"; // 또는 NewMatchPostModal
+import NewPostModal from "@/features/mercenary/components/MercenaryPostModal"; // 또는 NewMatchPostModal
 // 공용 컴포넌트 경로 사용
 import RegionSelectTrigger from "@/components/common/RegionSelectTrigger";
 import RegionSelectModal from "@/components/common/RegionSelectModal";

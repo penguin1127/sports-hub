@@ -4,12 +4,20 @@ import React, { useEffect, useState, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useRecruitStore } from "@/stores/useRecruitStore";
-import { PostType, RecruitCategory } from "@/types/recruitPost";
+import { 
+  RecruitPostCreationRequestDto, 
+  RecruitCategory, 
+  PostType 
+} from "@/types/recruitPost";
+import { createRecruitPostApi } from "../api/recruitApi";
+
+// ▼▼▼ 우리가 만든 컴포넌트들을 임포트합니다. ▼▼▼
+import MercenaryPostModal from "../components/MercenaryPostModal"; 
 import MercenaryDetailCard from "../components/MercenaryDetailCard";
-import NewPostModal from "../components/NewPostModal";
 import RegionSelectTrigger from "@/components/common/RegionSelectTrigger";
 import RegionSelectModal from "@/components/common/RegionSelectModal";
 import UserProfileModal from "@/components/common/UserProfileModal";
+
 
 const MercenaryPage = () => {
   const location = useLocation();
@@ -18,7 +26,6 @@ const MercenaryPage = () => {
   const user = useAuthStore((s) => s.user);
   const allPostsFromStore = useRecruitStore((s) => s.posts);
   const loadPosts = useRecruitStore((s) => s.loadPosts);
-  const createPost = useRecruitStore((s) => s.createPost);
   const removePost = useRecruitStore((s) => s.removePost);
 
   const focusedId = useMemo(() => new URLSearchParams(location.search).get("id"), [location.search]);
@@ -67,10 +74,17 @@ const MercenaryPage = () => {
     return postsToFilter;
   }, [allPostsFromStore, search, selectedRegion]);
 
-  const handleCreate = (post: PostType) => {
-    createPost(post);
-    loadPosts(RecruitCategory.MERCENARY);
-    setIsNewPostModalOpen(false);
+  // 'handleCreate' 함수는 모달로부터 최종 데이터를 받아 API 호출을 담당합니다.
+  const handleCreate = async (postData: RecruitPostCreationRequestDto) => {
+    try {
+      await createRecruitPostApi(postData);
+      alert("게시글이 성공적으로 등록되었습니다.");
+      setIsNewPostModalOpen(false); // 모달 닫기
+      await loadPosts(RecruitCategory.MERCENARY); // 목록 새로고침
+    } catch (error) {
+      console.error("게시글 생성 실패:", error);
+      alert("게시글 등록 중 오류가 발생했습니다.");
+    }
   };
 
   const handleDelete = async (postId: number) => {
@@ -126,13 +140,13 @@ const MercenaryPage = () => {
         )}
       </div>
 
-      {isNewPostModalOpen && (
-        <NewPostModal
-          category={RecruitCategory.MERCENARY}
-          onClose={() => setIsNewPostModalOpen(false)}
-          onSubmit={handleCreate}
-        />
-      )}
+      {/* ▼▼▼ 새로 만든 MercenaryPostModal을 여기서 호출합니다. ▼▼▼ */}
+      <MercenaryPostModal
+        isOpen={isNewPostModalOpen}
+        onClose={() => setIsNewPostModalOpen(false)}
+        onSubmit={handleCreate}
+      />
+      {/* ▲▲▲ category prop은 이제 모달이 직접 관리하므로 넘겨줄 필요 없습니다. ▲▲▲ */}
 
       <div className="mb-6 p-4 bg-gray-50 rounded-lg shadow">
         <div className="flex flex-wrap items-center gap-2 sm:gap-4">
@@ -163,14 +177,12 @@ const MercenaryPage = () => {
                   ? () => handleDelete(post.id)
                   : undefined
               }
-              // post.authorId가 null이 아닐 때만 openUserProfileModal 호출
               onAuthorNameClick={post.authorId !== null ? () => openUserProfileModal(post.authorId!) : undefined}
             />
           ))}
         </div>
       )}
 
-      {/* selectedUserIdForProfile이 null이 아닐 때만 UserProfileModal을 렌더링 */}
       {selectedUserIdForProfile !== null && (
         <UserProfileModal
           userId={selectedUserIdForProfile}
