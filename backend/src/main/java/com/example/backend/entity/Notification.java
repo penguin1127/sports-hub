@@ -5,7 +5,11 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+
 // 요약용 알림 테이블
+
+// 개인에게 보내는 알림을 담당하는 테이블(기본 적인 알림들을 처리하는 테이블)
+
 @Table(name = "notification")
 @Getter @Setter
 @AllArgsConstructor
@@ -24,7 +28,7 @@ public class Notification {
     @OneToOne
     @JoinColumn(name = "notificationDetail", nullable = false)
     private NotificationDetail detail;
-
+  
     @Column
     private String type; // 알림 종류
 
