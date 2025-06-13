@@ -1,14 +1,15 @@
 // src/features/mypage/components/MyProfileForm.tsx
 
-import { useEffect, useState,useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { getMyProfile } from "@/features/auth/api/userApi";
+import { getMyProfile, updateMyProfile } from "@/features/auth/api/userApi"; // updateMyProfile 임포트
 import { User } from "@/types/user";
 
 const MyProfileForm = () => {
   const [profile, setProfile] = useState<User | null>(null);
-  const { token } = useAuthStore();
-   const fetchCount = useRef(0); // useRef로 호출 횟수 추적
+  const [editableProfile, setEditableProfile] = useState<User | null>(null); // 수정 가능한 프로필 상태 추가
+  const [isEditing, setIsEditing] = useState(false); // 수정 모드 상태 추가
+  const { token, user: authUser, login } = useAuthStore(); // login 함수도 가져옴
 
   // ⛳ 내 정보 불러오기
   useEffect(() => {
@@ -18,17 +19,60 @@ const MyProfileForm = () => {
         console.log("/api/users/me 요청 보냄!");
         const data = await getMyProfile();
         setProfile(data);
+        setEditableProfile(data); // 수정 가능한 프로필에도 초기값 설정
         console.log("불러온 사용자 정보:", data);
       } catch (error) {
         console.error("프로필 불러오기 실패:", error);
       }
-       console.log("[MyProfileForm] fetchProfile 끝");
+      console.log("[MyProfileForm] fetchProfile 끝");
     };
 
-    if (token) {
+    if (token !== null && token !== "") {
       fetchProfile();
     }
   }, [token]);
+
+  // 입력 필드 변경 핸들러
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setEditableProfile((prev) => (prev ? { ...prev, [name]: value } : null));
+  };
+
+  // 수정 모드 활성화
+  const handleEditClick = () => {
+    setIsEditing(true);
+  };
+
+  // 수정 취소
+  const handleCancelClick = () => {
+    setIsEditing(false);
+    setEditableProfile(profile); // 원래 프로필로 되돌리기
+  };
+
+  // 프로필 저장 (수정 완료)
+  const handleSaveClick = async () => {
+    if (!editableProfile) return;
+
+    try {
+      console.log("프로필 수정 요청 보냄:", editableProfile);
+      const updatedUser = await updateMyProfile({ // updateMyProfile 함수 사용
+        name: editableProfile.name,
+        region: editableProfile.region,
+        preferredPosition: editableProfile.preferredPosition,
+        // 비밀번호는 여기서 수정하지 않으므로 포함하지 않음
+      });
+      setProfile(updatedUser); // 원본 프로필 업데이트
+      setIsEditing(false); // 보기 모드로 전환
+      // Zustand store의 user 정보도 업데이트 (선택 사항이지만 일관성을 위해 추천)
+      if (authUser && token) {
+        login(token, { ...authUser, ...updatedUser });
+      }
+      console.log("프로필 수정 성공:", updatedUser);
+    } catch (error) {
+      console.error("프로필 수정 실패:", error);
+      alert("프로필 수정에 실패했습니다.");
+    }
+  };
 
   if (!profile) return <p>내 정보를 불러오는 중입니다...</p>;
 
@@ -40,8 +84,10 @@ const MyProfileForm = () => {
           <label className="block text-sm font-medium text-gray-700">이름</label>
           <input
             type="text"
-            value={profile.name}
-            disabled
+            name="name" // name 속성 추가
+            value={editableProfile?.name || ""}
+            onChange={handleChange}
+            disabled={!isEditing} // isEditing 상태에 따라 disabled 설정
             className="mt-1 block w-full border px-3 py-2 rounded"
           />
         </div>
@@ -49,17 +95,20 @@ const MyProfileForm = () => {
           <label className="block text-sm font-medium text-gray-700">아이디</label>
           <input
             type="text"
-            value={profile.userid}
-            disabled
-            className="mt-1 block w-full border px-3 py-2 rounded"
+            name="userid" // name 속성 추가
+            value={editableProfile?.userid || ""}
+            disabled // 아이디는 수정 불가
+            className="mt-1 block w-full border px-3 py-2 rounded bg-gray-100"
           />
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">지역</label>
           <input
             type="text"
-            value={profile.region || ""}
-            disabled
+            name="region" // name 속성 추가
+            value={editableProfile?.region || ""}
+            onChange={handleChange}
+            disabled={!isEditing}
             className="mt-1 block w-full border px-3 py-2 rounded"
           />
         </div>
@@ -67,11 +116,39 @@ const MyProfileForm = () => {
           <label className="block text-sm font-medium text-gray-700">선호 포지션</label>
           <input
             type="text"
-            value={profile.preferred_position || ""}
-            disabled
+            name="preferredPosition" // name 속성 추가
+            value={editableProfile?.preferredPosition || ""}
+            onChange={handleChange}
+            disabled={!isEditing}
             className="mt-1 block w-full border px-3 py-2 rounded"
           />
         </div>
+      </div>
+
+      <div className="mt-6 flex justify-end space-x-3">
+        {!isEditing ? (
+          <button
+            onClick={handleEditClick}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+          >
+            수정
+          </button>
+        ) : (
+          <>
+            <button
+              onClick={handleCancelClick}
+              className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition"
+            >
+              취소
+            </button>
+            <button
+              onClick={handleSaveClick}
+              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+            >
+              저장
+            </button>
+          </>
+        )}
       </div>
     </div>
   );

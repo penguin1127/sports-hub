@@ -10,6 +10,9 @@ import com.example.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+
 @Service
 @RequiredArgsConstructor // 기본 생성자
 public class RecruitApplyService {
@@ -26,9 +29,10 @@ public class RecruitApplyService {
        RecruitApplication application = RecruitApplication.builder() // 신청 대기 클래스에 유저 외래키, 자기소개, 신청 날짜 값들을 대입함, 참고로 builder()는 정적이므로 new 키워드 x
                .user(user)
                .description(dto.getDescription())
-               .applicationDate(dto.getApplicationDate())
+               .applicationDate(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                .build();
-
+        //팀장한테 알림 보내기: 신청된 RecruitPost를 통해 팀장의 정보를 얻음 -> Notification 객체를 생성하여 알림 테이블에 저장 ->
+        // 프론트에서 Notification 테이블 정보 표시
         //리포지토리에서 저장함.
         recruitApplicationRepository.save(application);
     }

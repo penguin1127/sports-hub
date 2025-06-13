@@ -1,0 +1,23 @@
+# 모든 텍스트 파일은 Git 저장소에서는 LF, OS 환경에 맞춰 변환
+* text=auto
+
+# 명시적으로 LF 강제 적용 (선택사항)
+*.ts text eol=lf
+*.tsx text eol=lf
+*.js text eol=lf
+*.jsx text eol=lf
+*.json text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+
+# 바이너리 파일은 줄바꿈 처리 안함
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.ttf binary
+*.woff binary
+*.woff2 binary

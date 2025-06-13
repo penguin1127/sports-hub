@@ -1,5 +1,7 @@
+// src/components/layout/Header.tsx (또는 실제 경로)
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { RecruitCategory } from "@/types/recruitPost"; // RecruitCategory Enum 임포트
 
 const Header = () => {
   const navigate = useNavigate();
@@ -10,31 +12,33 @@ const Header = () => {
     navigate("/login");
   };
 
+  // Helper function to convert enum value to lowercase string for URL path
+  const categoryEnumToPathString = (categoryEnum: RecruitCategory): string => {
+    return categoryEnum.toString().toLowerCase();
+  };
+
   return (
-    <header className="bg-[#0f1625] py-5 text-white">
+    <header className="bg-[#0f1625] py-5 text-white fixed top-0 left-0 right-0 z-50">
       <div className="max-w-screen-xl mx-auto flex justify-between items-center px-4">
-        {/* 로고 */}
         <Link to="/" className="text-2xl font-bold tracking-wide">
           <span className="border-r pr-3 mr-3 text-white">Sport-Hub</span>
         </Link>
 
-        {/* 중앙 메뉴 */}
         <nav className="flex gap-8 text-white text-base font-sans">
-          <Link to="/mercenary" className="text-white hover:text-white">용병 목록</Link>
-          <Link to="/team" className="text-white hover:text-white">팀 모집</Link>
-          <Link to="/apply" className="text-white hover:text-white">경기 모집</Link>
+          <Link to={`/${categoryEnumToPathString(RecruitCategory.MERCENARY)}`} className="text-white hover:text-gray-300">용병 목록</Link>
+          <Link to={`/${categoryEnumToPathString(RecruitCategory.TEAM)}`} className="text-white hover:text-gray-300">팀 모집</Link>
+          <Link to={`/${categoryEnumToPathString(RecruitCategory.MATCH)}`} className="text-white hover:text-gray-300">경기 모집</Link>
           {isLoggedIn && (
-          <Link to="/match" className="text-white hover:text-white">팀관리</Link>
+            <Link to="/team-manage" className="text-white hover:text-gray-300">팀 관리</Link> // 팀 관리 경로 예시
           )}
         </nav>
 
-        {/* 오른쪽 버튼들 */}
         <div className="flex items-center gap-4">
           {isLoggedIn ? (
             <>
               <button
                 className="bg-yellow-400 hover:bg-yellow-300 text-black px-4 py-1 rounded text-sm"
-                onClick={() => alert("알림센터 클릭")}
+                onClick={() => alert("알림센터 기능은 준비 중입니다.")}
               >
                 알림센터
               </button>
@@ -60,7 +64,7 @@ const Header = () => {
                 로그인
               </Link>
               <Link
-                to="/register"
+                to="/signup"
                 className="bg-gray-100 hover:bg-gray-200 text-black px-4 py-1 rounded text-sm"
               >
                 회원가입

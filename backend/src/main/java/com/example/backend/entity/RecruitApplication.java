@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 // 신청 대기 테이블(신청한 사용자도 수락, 거절, 대기 여부를 볼 수 있다는 장점 존재.)
-//@Table(name = "recruit_application")
+@Table(name = "recruit_application")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -26,7 +26,7 @@ public class RecruitApplication {
 
     @ManyToOne // 여러개의 동일한 post_id를 사용가능. -> 하나의 모집 글에 여러명 신청 가능, N:1
     @JoinColumn(name = "post_id", nullable = false)
-    private RecruitPost post;
+    private RecruitPost postID;
 
     @Column(length = 150) // 자기소개 글자 최대 길이: 150자
     private String description;

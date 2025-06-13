@@ -15,14 +15,12 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RecruitApplyDTO {
-    //private User userId; // 팀장한테는 이름만 보여주면 되기 때문, userId는 프론트에서 받아오기 x
+    private Long userId; // 팀장한테는 이름만 보여주면 되기 때문, userId는 프론트에서 받아오기 x
     private String description; // 자기 소개 글
-
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
-    private LocalDateTime applicationDate; // 신청 날짜
-
-    private long userId;
     private String username;
+    //@JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+    private LocalDateTime applicationDate; // 신청 날짜
+    private Long postID; // 각각의 포스트를 식별하기 위해서 받아와야 함.
 
     // Entity 생성을 service에서 담당하고 있기 때문에 ToEntity()는 쓸 필요가 없음.
     /*
