@@ -17,6 +17,7 @@ import java.time.ZoneId;
 @RequiredArgsConstructor // 기본 생성자
 public class RecruitApplyService {
 
+    private final NotificationService notificationService;
     private final RecruitApplicationRepository recruitApplicationRepository;
     private final UserRepository userRepository;
 
