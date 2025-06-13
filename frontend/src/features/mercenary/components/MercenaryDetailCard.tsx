@@ -1,11 +1,12 @@
 // src/features/mercenary/components/MercenaryDetailCard.tsx
 
-import React from 'react'; // React 임포트
-import type { PostType } from "@/types/recruitPost"; // PostType은 타입으로만 사용될 수 있음
-// Enum을 값으로 사용하므로 일반 import로 변경
-import {  RecruitStatus } from "@/types/recruitPost";
+import React from 'react';
+import type { PostType } from "@/types/recruitPost";
+import { RecruitStatus } from "@/types/recruitPost";
+import { useAuthStore } from '@/stores/useAuthStore';
+import { applyToPostApi } from '../api/recruitApi';
+import { Link } from 'react-router-dom';
 
-// Props 타입 정의
 interface MercenaryDetailCardProps {
   post: PostType;
   isExpanded: boolean;
@@ -13,15 +14,13 @@ interface MercenaryDetailCardProps {
   onExpand?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
-  onAuthorNameClick?: () => void; // 작성자 이름 클릭 핸들러 prop 추가
+  onAuthorNameClick?: () => void;
 }
 
-// 상태에 따른 텍스트 및 스타일 반환 헬퍼 함수
 const getStatusDisplayForDetail = (statusValue: PostType["status"]): React.ReactNode => {
   let styleClass = "font-semibold ";
-  let statusText = statusValue as string; // PostType.status가 string이라고 가정
+  let statusText = statusValue as string;
 
-  // RecruitStatus Enum 값과 직접 비교
   if (statusValue === RecruitStatus.RECRUITING) {
     styleClass += "text-green-600";
     statusText = "모집중";
@@ -38,17 +37,15 @@ const getStatusDisplayForDetail = (statusValue: PostType["status"]): React.React
      styleClass += "text-gray-600";
      statusText = "종료";
   } else {
-    styleClass += "text-gray-700"; // 알 수 없는 상태 또는 기본 상태
+    styleClass += "text-gray-700";
   }
   return <span className={styleClass}>{statusText}</span>;
 };
 
-const MercenaryDetailCard = ({ post, isExpanded, onClose, onExpand, onEdit, onDelete, onAuthorNameClick }: MercenaryDetailCardProps) => {
-  
-  // ▼▼▼ 1. 'fromParticipant'를 기준으로 모집 유형을 파악합니다. ▼▼▼
-  const isTeamToIndividual = post.fromParticipant === 'TEAM';
+const MercenaryDetailCard: React.FC<MercenaryDetailCardProps> = ({ post, isExpanded, onClose, onExpand, onEdit, onDelete, onAuthorNameClick }) => {
+  const { user } = useAuthStore();
 
-  // ▼▼▼ 2. 파악된 유형에 따라 라벨 텍스트를 동적으로 생성합니다. ▼▼▼
+  const isTeamToIndividual = post.fromParticipant === 'TEAM';
   const flowLabel = isTeamToIndividual ? "팀 → 개인" : "개인 → 팀";
   const dateLabel = isTeamToIndividual ? '경기 날짜' : '활동 가능 날짜';
   const timeLabel = isTeamToIndividual ? '경기 시간' : '활동 가능 시간';
@@ -56,6 +53,22 @@ const MercenaryDetailCard = ({ post, isExpanded, onClose, onExpand, onEdit, onDe
 
   const formattedDate = post.gameDate ? post.gameDate.toString().split("T")[0] : "날짜 미정";
   const formattedTime = post.gameTime || "시간 미정";
+
+  const handleApply = async () => {
+    const message = prompt("작성자에게 전달할 간단한 메시지를 입력하세요 (선택사항):");
+    if (message === null) return;
+
+    try {
+      const responseMessage = await applyToPostApi(post.id, { message });
+      alert(responseMessage);
+    } catch (error) {
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert("알 수 없는 오류가 발생했습니다.");
+      }
+    }
+  };
 
   // 요약 카드 (펼치기 전)
   if (!isExpanded) {
@@ -134,9 +147,18 @@ const MercenaryDetailCard = ({ post, isExpanded, onClose, onExpand, onEdit, onDe
         <p className="mt-2 whitespace-pre-wrap"><strong>상세 내용:</strong><br/>{post.content}</p>
       </div>
 
-      {/* ▼▼▼ 수정 및 삭제 버튼 영역 ▼▼▼ */}
       <div className="mt-6 text-right space-x-2">
-        {/* 'onEdit' prop이 있을 때만 수정 버튼을 보여줍니다. */}
+        {/* 신청하기 버튼 */}
+        {user && user.id !== post.authorId && post.status === RecruitStatus.RECRUITING && (
+          <button 
+            onClick={(e) => { e.stopPropagation(); handleApply(); }}
+            className="bg-green-500 hover:bg-green-600 text-white text-sm px-4 py-2 rounded"
+          >
+            신청하기
+          </button>
+        )}
+        
+        {/* 수정 버튼 */}
         {onEdit && (
             <button 
                 onClick={(e) => { e.stopPropagation(); onEdit(); }} 
@@ -145,7 +167,7 @@ const MercenaryDetailCard = ({ post, isExpanded, onClose, onExpand, onEdit, onDe
                 수정
             </button>
         )}
-        {/* 'onDelete' prop이 있을 때만 삭제 버튼을 보여줍니다. */}
+        {/* 삭제 버튼 */}
         {onDelete && (
           <button 
             onClick={(e) => { e.stopPropagation(); onDelete(); }} 

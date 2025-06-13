@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import com.example.backend.dto.application.ApplicationRequestDto;
+import com.example.backend.service.ApplicationService;
 
 import java.util.List;
 
@@ -27,7 +29,7 @@ import java.util.List;
 public class RecruitPostController {
 
     private final RecruitPostService recruitPostService;
-
+    private final ApplicationService applicationService;
     /**
      * 전체 모집글 목록 조회
      * DTO 목록을 반환
@@ -99,5 +101,19 @@ public class RecruitPostController {
 
         RecruitPostResponseDto updatedPost = recruitPostService.updatePost(id, requestDto, userDetails.getUsername());
         return ResponseEntity.ok(updatedPost);
+    }
+
+    /**
+     * 특정 모집글에 지원 신청
+     */
+    @PostMapping("/{postId}/apply")
+    public ResponseEntity<String> applyToPost(
+            @PathVariable Long postId,
+            @RequestBody ApplicationRequestDto requestDto,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        applicationService.createApplication(postId, requestDto, userDetails.getUsername());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body("신청이 성공적으로 완료되었습니다.");
     }
 }

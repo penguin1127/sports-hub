@@ -45,4 +45,13 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
 
     // 신청 상태별로 신청 조회 (전체)
     List<Application> findByApplicationStatus(ApplicationStatus applicationStatus);
+
+    // 특정 사용자가 특정 게시글에 이미 신청했는지 확인하기 위한 메소드
+    boolean existsByRecruitPostIdAndApplicantId(Long recruitPostId, Long applicantId);
+
+    // 특정 사용자의 모든 신청 내역을 조회하는 메소드 (나중에 '신청 내역' 페이지에서 사용)
+    List<Application> findByApplicantIdOrderByAppliedAtDesc(Long applicantId);
+
+    // 특정 게시글에 들어온 모든 신청 내역을 조회하는 메소드 (나중에 게시글 주인이 확인하는 용도)
+    List<Application> findByRecruitPostIdOrderByAppliedAtDesc(Long recruitPostId);
 }
