@@ -1,5 +1,6 @@
 package com.example.backend.entity;
 
+import com.example.backend.enums.NotificationType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,19 +22,24 @@ public class NotificationDetail {
     @JoinColumn(name = "notification_id", nullable = false)
     private Notification notificationID;
 
-    @Enumerated(EnumType.STRING) // Enum의 순서(숫자 배열)로 저장할지 이름으로 저장할지 결정 -> single: 문자로 저장
-    private String type;
-
-    @Column(name = "target_id")
-    private Long targetID; // 신청글 또는 모집글 ID
-
-    private String rediretUrl; // 상세보기를 누를 때 이동시킬 경로
-
     @ManyToOne
     @JoinColumn(name = "post_id")
     private RecruitPost postID; // 연관된 모잡글 ID
 
     @ManyToOne
     @JoinColumn(name = "post_application_id")
-    private RecruitApplication postApplicationID; // 연관된 신청 ID
+    private Application postApplicationID; // 연관된 신청 ID
+
+    @Enumerated(EnumType.STRING) // Enum의 순서(숫자 배열)로 저장할지 이름으로 저장할지 결정 -> single: 문자로 저장
+    private NotificationType type;
+
+    @Column(name = "target_id")
+    private Long targetID; // 신청글 또는 모집글 ID
+
+    @Column
+    private String redirectUrl; // 상세보기를 누를 때 이동시킬 경로 -> 알림을 클릭할 때 간편하게 넘어간다면 사용자 편의성이 증가함.
+
+    @Column
+    private String fullContent;
+
 }

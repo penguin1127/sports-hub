@@ -10,6 +10,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
+@Table(name = "mercenary_participation")
 @Entity
 public class MercenaryParticipation {
 

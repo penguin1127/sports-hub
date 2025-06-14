@@ -9,6 +9,7 @@ import com.example.backend.enums.RecruitTargetType;
 import lombok.Getter;
 import lombok.Setter;
 
+// 모집글을 생성할 때 사용되는 dto 클래스
 @Getter
 @Setter
 public class RecruitPostCreationRequest {

@@ -1,13 +1,8 @@
 package com.example.backend.dto;
 
-import com.example.backend.entity.RecruitApplication;
-import com.example.backend.entity.User;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 // 모집 공고를 본 사람이 팀장한테 신청을 보낼 경우.
 @Getter
