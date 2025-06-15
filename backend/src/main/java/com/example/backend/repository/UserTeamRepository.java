@@ -19,4 +19,5 @@ public interface UserTeamRepository extends JpaRepository<UserTeam, UserTeamId> 
     // 필요하다면 특정 유저의 UserTeam 관계를 찾는 메서드
     List<UserTeam> findByUser(User user);
     List<UserTeam> findByTeam(Team team); // ✅ 반환 타입 List<UserTeam>으로 명시
+    List<UserTeam> findByUserId(Long userId);
 }

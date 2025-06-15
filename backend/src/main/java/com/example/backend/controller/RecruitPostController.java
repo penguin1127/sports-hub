@@ -1,14 +1,21 @@
 package com.example.backend.controller;
 
-import com.example.backend.entity.RecruitPost;
+import com.example.backend.dto.auth.RecruitPostCreationRequest;
+
+import com.example.backend.dto.auth.RecruitPostUpdateRequest;
 import com.example.backend.service.RecruitPostService;
 import com.example.backend.dto.auth.RecruitPostResponseDto;
 import com.example.backend.enums.RecruitCategory; // RecruitCategory enum import
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page; // Page import
 import org.springframework.data.domain.Pageable; // Pageable import
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import com.example.backend.dto.application.ApplicationRequestDto;
+import com.example.backend.service.ApplicationService;
 
 import java.util.List;
 
@@ -22,7 +29,7 @@ import java.util.List;
 public class RecruitPostController {
 
     private final RecruitPostService recruitPostService;
-
+    private final ApplicationService applicationService;
     /**
      * 전체 모집글 목록 조회
      * DTO 목록을 반환
@@ -42,19 +49,33 @@ public class RecruitPostController {
     }
 
     /**
-     * 모집글 생성
+     * 모집글 생성 (수정된 버전)
      */
     @PostMapping
-    public ResponseEntity<RecruitPostResponseDto> createPost(@RequestBody RecruitPost recruitPost) {
-        return ResponseEntity.ok().body(recruitPostService.createPost(recruitPost));
-    }
+    public ResponseEntity<RecruitPostResponseDto> createPost(
+            @RequestBody RecruitPostCreationRequest requestDto,
+            @AuthenticationPrincipal UserDetails userDetails) { // ◀ 로그인한 사용자 정보 자동 주입
 
-    /**
-     * 모집글 삭제
+        // userDetails가 null이면 JWT 필터에서 이미 차단되지만, 안전을 위해 확인
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        String currentLoginId = userDetails.getUsername();
+        RecruitPostResponseDto createdPost = recruitPostService.createPost(requestDto, currentLoginId);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdPost); // ◀ 201 Created 상태 코드 반환
+    }
+    /*
+     * 모집글 삭제 (권한 확인 로직 추가 버전)
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePost(@PathVariable Long id) {
-        recruitPostService.deletePost(id);
+    public ResponseEntity<Void> deletePost(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        // 로그인한 사용자 ID를 서비스로 전달
+        recruitPostService.deletePost(id, userDetails.getUsername());
         return ResponseEntity.noContent().build();
     }
 
@@ -69,5 +90,30 @@ public class RecruitPostController {
         return ResponseEntity.ok().body(recruitPostService.getPostsByCategory(category, pageable));
     }
 
-    // 다른 필터링/검색 엔드포인트도 필요하다면 유사하게 추가할 수 있습니다.
+    /**
+     * 모집글 수정
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<RecruitPostResponseDto> updatePost(
+            @PathVariable Long id,
+            @RequestBody RecruitPostUpdateRequest requestDto,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        RecruitPostResponseDto updatedPost = recruitPostService.updatePost(id, requestDto, userDetails.getUsername());
+        return ResponseEntity.ok(updatedPost);
+    }
+
+    /**
+     * 특정 모집글에 지원 신청
+     */
+    @PostMapping("/{postId}/apply")
+    public ResponseEntity<String> applyToPost(
+            @PathVariable Long postId,
+            @RequestBody ApplicationRequestDto requestDto,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        applicationService.createApplication(postId, requestDto, userDetails.getUsername());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body("신청이 성공적으로 완료되었습니다.");
+    }
 }

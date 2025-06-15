@@ -9,7 +9,7 @@ interface RecruitPostListProps {
   onDelete: (postId: number) => void; // 삭제 기능이 필요할 경우를 대비해 여전히 받음
 }
 
-const RecruitPostList: React.FC<RecruitPostListProps> = ({ posts, onDelete }) => {
+const RecruitPostList: React.FC<RecruitPostListProps> = ({ posts, }) => {
   if (!posts || posts.length === 0) {
     return <p className="text-gray-600">등록된 게시물이 없습니다.</p>;
   }

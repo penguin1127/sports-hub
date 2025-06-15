@@ -56,7 +56,7 @@ export enum RecruitStatus {
  * 백엔드 RecruitPostCreationRequest.java 와 필드 구조 및 타입을 일치시킵니다.
  */
 export interface RecruitPostCreationRequestDto {
-  authorId: number; // User 엔티티의 id 타입과 일치
+  //authorId: number; // User 엔티티의 id 타입과 일치
   title: string;
   content: string;
   category: RecruitCategory; // Enum 값 전송
@@ -70,13 +70,43 @@ export interface RecruitPostCreationRequestDto {
   ageGroup?: string;
   preferredPositions?: string;
   thumbnailUrl?: string;
-  // requiredPersonnel: String; // 백엔드 DTO가 String 이라면 String, Integer면 number
-  // 이전 RecruitPostCreationRequest.java는 String requiredPersonnel 이었음.
-  // 일관성을 위해 백엔드 DTO의 requiredPersonnel을 Integer로 변경하는 것을 권장.
-  // 여기서는 백엔드 DTO가 Integer requiredPersonnel; 로 수정되었다고 가정.
   requiredPersonnel?: number;
   targetType: RecruitTargetType; // Enum 값 전송
   fromParticipant: ParticipantType; // Enum 값 전송
   toParticipant: ParticipantType;   // Enum 값 전송
-  status: RecruitStatus; // Enum 값 전송 (생성 시 기본값은 보통 RECRUITING)
+  //status: RecruitStatus; // Enum 값 전송 (생성 시 기본값은 보통 RECRUITING)
 }
+
+/**
+ * 백엔드로부터 받는 모집 게시글 응답 데이터 타입 (DTO)
+ * GET /api/recruit-posts 또는 POST /api/recruit-posts 응답에 사용됩니다.
+ */
+export interface RecruitPostResponseDto {
+  id: number;
+  title: string;
+  content: string;
+  region: string;
+  subRegion: string | null; // null일 수 있음
+  thumbnailUrl: string | null;
+  category: 'MERCENARY' | 'TEAM' | 'MATCH'; // Enum은 보통 문자열로 넘어옵니다.
+  targetType: string; // 'TEAM_TO_INDIVIDUAL' | 'INDIVIDUAL_TO_TEAM' 등
+  fromParticipant: string | null;
+  toParticipant: string | null;
+  gameDate: string; // "YYYY-MM-DD" 형식의 문자열
+  gameTime: string; // "HH:mm:ss" 형식의 문자열
+  status: 'RECRUITING' | 'COMPLETED'; // 모집중, 모집완료 등
+  requiredPersonnel: number | null;
+  ageGroup: string | null;
+  preferredPositions: string | null;
+  matchRules: string | null;
+  minPlayers: number | null;
+  maxPlayers: number | null;
+  authorId: number | null;
+  authorName: string | null;
+  createdAt: string; // "YYYY-MM-DDTHH:mm:ss" 형식의 ISO 문자열
+  updatedAt: string;
+}
+
+
+export type RecruitPostUpdateRequestDto = Partial<RecruitPostCreationRequestDto>;
+

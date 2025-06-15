@@ -1,60 +1,65 @@
 package com.example.backend.service;
 
-import com.example.backend.dto.auth.ApplicationRequestDTO;
-import com.example.backend.dto.auth.ApplicationResponseDTO;
+import com.example.backend.dto.application.ApplicationRequestDto;
 import com.example.backend.entity.*;
 import com.example.backend.enums.ApplicationStatus;
-import com.example.backend.enums.Position;
+import com.example.backend.enums.RecruitStatus;
 import com.example.backend.repository.*;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-// 용병, 경기, 팀 신청을 처리하는 컨트롤러를 처리하는 서비스
-@AllArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class ApplicationService {
 
-    final private TeamRepository teamRepository; // 팀으로 신청하는 경우 사용
-    final private RecruitPostRepository recruitPostRepository; // 어떤 모집글에 대한 신청인지 확인하기 위해 사용
-    final private ApplicationRepository applicationRepository; // 최종적으로 Application 엔티티를 DB에 저장하기 위해 사용
+    private final ApplicationRepository applicationRepository;
+    private final UserRepository userRepository;
+    private final RecruitPostRepository recruitPostRepository;
+    private final TeamRepository teamRepository; // 팀 신청 시 필요
 
-    // IllegalArgumentException: 유효하지 않거나 부적절한 인수를 넣었을 때 발생되는 예외 처리
+    private final NotificationService notificationService;
+    @Transactional
+    public Application createApplication(Long postId, ApplicationRequestDto requestDto, String applicantLoginId) {
+        // 1. 필요한 엔티티 조회
+        User applicant = userRepository.findByUserid(applicantLoginId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        RecruitPost recruitPost = recruitPostRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("모집글을 찾을 수 없습니다."));
 
-    public ApplicationResponseDTO apply(ApplicationRequestDTO dto, User applicant){
-
-        // 모집글 조회
-        RecruitPost post = recruitPostRepository.findById(dto.getRecruitPostId())
-                .orElseThrow(() -> new IllegalArgumentException("모집글 없음"));
-
-        // 팀으로 신청할 경우
-        Team team = null;
-        if(dto.getApplicantTeamId() != null){
-            team = teamRepository.findById(dto.getApplicantTeamId())
-                    .orElseThrow(() -> new IllegalArgumentException("팀 없음"));
+        // 2. 비즈니스 로직 검증
+        // 2-1. 본인 글에는 지원 불가
+        if (recruitPost.getAuthor().getId().equals(applicant.getId())) {
+            throw new AccessDeniedException("본인이 작성한 글에는 신청할 수 없습니다.");
+        }
+        // 2-2. 모집중인 글에만 지원 가능
+        if (recruitPost.getStatus() != RecruitStatus.RECRUITING) {
+            throw new IllegalStateException("모집이 마감된 글입니다.");
+        }
+        // 2-3. 중복 지원 방지
+        if (applicationRepository.existsByRecruitPostIdAndApplicantId(postId, applicant.getId())) {
+            throw new IllegalStateException("이미 이 게시글에 신청했습니다.");
         }
 
-        // 중복 신청 방지 - 구현중
-        /*
-        boolean alreadyExists = applicationRepository.existsByRecruitPostAndApplicantAndApplicationStatus(new)
-         */
+        Team applicantTeam = null;
+        if (requestDto.getApplicantTeamId() != null) {
+            applicantTeam = teamRepository.findById(requestDto.getApplicantTeamId())
+                    .orElseThrow(() -> new IllegalArgumentException("신청하려는 팀을 찾을 수 없습니다."));
+            // TODO: 신청자가 해당 팀의 팀장 또는 관리자인지 확인하는 로직 추가 가능
+        }
 
-        // 신청 엔티티 생성
-        Application application = Application.builder()
-                .applicant(applicant) // 신청 행위를 한 사용자
-                .recruitPost(post) // 특정 모집글
-                .applicantTeam(team) // 팀 신청일 때만
-                .message(dto.getMessage()) // 신청할 때 자기소개
-                .applicationStatus(ApplicationStatus.PENDING) // 초기 값 보류중
+        // 3. Application 엔티티 생성 및 저장
+        Application newApplication = Application.builder()
+                .recruitPost(recruitPost)
+                .applicant(applicant)
+                .applicantTeam(applicantTeam) // 팀 신청이 아니면 null
+                .message(requestDto.getMessage())
+                .applicationStatus(ApplicationStatus.PENDING) // 초기 상태는 '대기중'
                 .build();
 
-        applicationRepository.save(application); //  방금 대입한 내용 db에 저장.
-        // 응답 DTO 생성
-        return ApplicationResponseDTO.builder()
-                .applicationId(application.getId())
-                .recruitTitle(post.getTitle())
-                .applicantName(applicant.getName())
-                .status(application.getApplicationStatus().name())
-                .appliedAt(application.getAppliedAt())
-                .build();
+        Application savedApplication = applicationRepository.save(newApplication);
+        notificationService.notifyApplication(recruitPost.getId(), savedApplication.getId(), recruitPost.getAuthor()); // post ID, Application ID, 이 알람을 수신할 User의 getId
+        return savedApplication;
     }
 }

@@ -57,7 +57,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, onClose }) 
       onClick={handleBackdropClick}
     >
       <div 
-        className="bg-white w-full max-w-lg rounded-xl shadow-2xl p-6 md:p-8 transform transition-all duration-300 ease-in-out scale-95 opacity-0 animate-modalShow"
+        className="bg-white w-full max-w-lg rounded-xl shadow-2xl p-6 md:p-8 transform transition-all duration-300 ease-in-out scale-95 animate-modalShow"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center mb-6">

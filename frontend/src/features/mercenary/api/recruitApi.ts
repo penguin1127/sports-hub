@@ -1,10 +1,16 @@
-// src/features/mercenary/api/recruitApi.ts (또는 recruitApi.ts)
+// src/features/mercenary/api/recruitApi.ts
 
-import axiosInstance from "@/lib/axiosInstance"; // axiosInstance 경로 확인
-import { PostType, RecruitCategory, RecruitPostCreationRequestDto } from "@/types/recruitPost";
-import { PageResponse } from "@/types/PageResponse";
+import axiosInstance from "@/lib/axiosInstance";
+import type { 
+  PostType, 
+  RecruitPostCreationRequestDto, 
+  RecruitPostResponseDto,
+  RecruitPostUpdateRequestDto
+} from "@/types/recruitPost";
+import type { PageResponse } from "@/types/PageResponse";
+import type { ApplicationRequestDto } from '@/types/application';
 
-const API_BASE_URL = "http://localhost:8080/api/recruit-posts";
+const API_BASE_URL = "/api/recruit-posts";
 
 export const fetchRecruitPosts = async (category: string, page: number = 0, size: number = 10): Promise<PostType[]> => {
   try {
@@ -18,31 +24,57 @@ export const fetchRecruitPosts = async (category: string, page: number = 0, size
   }
 };
 
-// ... (fetchAllRecruitPosts 함수는 필요시 유지) ...
-
-/**
- * 새로운 모집 게시글 생성 API 호출 함수
- * @param postData 생성할 게시글 데이터 (RecruitPostCreationRequestDto 타입)
- * @returns 생성된 게시글 정보 (PostType 또는 RecruitPostResponseDto 타입)
- */
-export const createRecruitPostApi = async (postData: RecruitPostCreationRequestDto): Promise<PostType> => {
+export const createRecruitPostApi = async (postData: RecruitPostCreationRequestDto): Promise<RecruitPostResponseDto> => {
   try {
-    // 백엔드 Controller의 @PostMapping이 받는 타입이 RecruitPost 엔티티이므로,
-    // 프론트에서 보내는 DTO와 필드가 최대한 유사해야 하며,
-    // 백엔드에서 이 DTO를 RecruitPost 엔티티로 변환하여 저장해야 합니다.
-    // 현재 RecruitPostController는 @RequestBody RecruitPost recruitPost로 받고 있으므로,
-    // 이 DTO는 RecruitPost 엔티티의 필드와 거의 일치해야 합니다.
-    // (authorId 대신 author 객체를 보내거나, 백엔드에서 authorId로 User를 찾아 설정)
-    // 여기서는 RecruitPostCreationRequestDto를 보내고 백엔드에서 처리한다고 가정합니다.
-    console.log("[recruitApi] Creating post with data:", JSON.stringify(postData, null, 2));
-    const response = await axiosInstance.post<PostType>(`${API_BASE_URL}`, postData, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
+    const response = await axiosInstance.post<RecruitPostResponseDto>(API_BASE_URL, postData);
     return response.data;
-  } catch (error) {
-    console.error("Error creating recruit post:", error);
-    throw error;
+  } catch (error: unknown) {
+    // ▼▼▼ 새로운 에러 처리 방식 ▼▼▼
+    if (typeof error === 'object' && error !== null && 'response' in error) {
+      const err = error as { response?: { data?: { message?: string } } };
+      throw new Error(err.response?.data?.message || '게시글 생성 중 오류가 발생했습니다.');
+    }
+    throw new Error('알 수 없는 오류가 발생했습니다.');
+  }
+};
+
+export const deleteRecruitPostApi = async (postId: number): Promise<void> => {
+  try {
+    await axiosInstance.delete(`${API_BASE_URL}/${postId}`);
+  } catch (error: unknown) {
+    // ▼▼▼ 새로운 에러 처리 방식 ▼▼▼
+    if (typeof error === 'object' && error !== null && 'response' in error) {
+      const err = error as { response?: { data?: { message?: string } } };
+      throw new Error(err.response?.data?.message || '게시글 삭제 중 오류가 발생했습니다.');
+    }
+    throw new Error('알 수 없는 오류가 발생했습니다.');
+  }
+};
+
+export const updateRecruitPostApi = async (postId: number, updateData: RecruitPostUpdateRequestDto): Promise<RecruitPostResponseDto> => {
+  try {
+    const response = await axiosInstance.put<RecruitPostResponseDto>(`${API_BASE_URL}/${postId}`, updateData);
+    return response.data;
+  } catch (error: unknown) {
+    // ▼▼▼ 새로운 에러 처리 방식 ▼▼▼
+    if (typeof error === 'object' && error !== null && 'response' in error) {
+      const err = error as { response?: { data?: { message?: string } } };
+      throw new Error(err.response?.data?.message || '게시글 수정 중 오류가 발생했습니다.');
+    }
+    throw new Error('알 수 없는 오류가 발생했습니다.');
+  }
+};
+
+export const applyToPostApi = async (postId: number, applicationData: ApplicationRequestDto): Promise<string> => {
+  try {
+    const response = await axiosInstance.post<string>(`${API_BASE_URL}/${postId}/apply`, applicationData);
+    return response.data;
+  } catch (error: unknown) {
+    // ▼▼▼ 새로운 에러 처리 방식 ▼▼▼
+    if (typeof error === 'object' && error !== null && 'response' in error) {
+      const err = error as { response?: { data?: { message?: string } } };
+      throw new Error(err.response?.data?.message || '신청 처리 중 오류가 발생했습니다.');
+    }
+    throw new Error('알 수 없는 오류가 발생했습니다.');
   }
 };

@@ -1,16 +1,22 @@
 // src/main/java/com/example/backend/service/UserService.java
 package com.example.backend.service;
 
+import com.example.backend.dto.auth.RecruitPostResponseDto;
+import com.example.backend.dto.team.TeamSummaryResponseDto;
+import com.example.backend.entity.RecruitPost;
 import com.example.backend.entity.User;
+import com.example.backend.entity.UserTeam;
+import com.example.backend.repository.RecruitPostRepository;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.dto.user.UserSignUpRequestDto;
 import com.example.backend.dto.user.UserProfileUpdateDto;
 import com.example.backend.dto.user.UserResponseDto;
-import com.example.backend.dto.user.PublicUserProfileResponseDto; // ✅ 추가: 공개 프로필 DTO 임포트
+import com.example.backend.dto.user.PublicUserProfileResponseDto; // 추가: 공개 프로필 DTO 임포트
 import com.example.backend.exception.ResourceNotFoundException;
 import com.example.backend.exception.DuplicateException;
 
-import jakarta.transaction.Transactional;
+import com.example.backend.repository.UserTeamRepository;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,7 +32,8 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
+    private final UserTeamRepository userTeamRepository;
+    private final RecruitPostRepository recruitPostRepository;
     // 1. 회원가입
     public UserResponseDto signUp(UserSignUpRequestDto signUpDto) {
         if (userRepository.existsByEmail(signUpDto.getEmail())) {
@@ -73,7 +80,7 @@ public class UserService {
         return UserResponseDto.fromEntity(user);
     }
 
-    // ✅ 3-1. 다른 사용자의 공개 프로필 정보 조회 (by id)
+    //  3-1. 다른 사용자의 공개 프로필 정보 조회 (by id)
     public PublicUserProfileResponseDto getPublicUserProfileById(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("사용자를 찾을 수 없습니다. ID: " + userId));
@@ -150,5 +157,76 @@ public class UserService {
         Optional.ofNullable(updateDto.getActivityStartDate()).ifPresent(user::setActivityStartDate);
         Optional.ofNullable(updateDto.getActivityEndDate()).ifPresent(user::setActivityEndDate);
         Optional.ofNullable(updateDto.getBirthDate()).ifPresent(user::setBirthDate);
+    }
+
+    /**
+     * 특정 사용자가 속한 팀 목록 조회
+     */
+    @Transactional(readOnly = true)
+    public List<TeamSummaryResponseDto> getUserTeams(Long userId) {
+        // 1. 해당 유저가 존재하는지 확인 (선택적이지만 좋은 습관)
+        if (!userRepository.existsById(userId)) {
+            throw new IllegalArgumentException("해당 사용자가 존재하지 않습니다. ID=" + userId);
+        }
+
+        // 2. UserTeamRepository를 통해 사용자가 속한 팀 관계 목록을 가져옴
+        List<UserTeam> userTeams = userTeamRepository.findByUserId(userId);
+
+        // 3. 각 UserTeam 엔티티를 TeamSummaryResponseDto로 변환하여 리스트로 반환
+        return userTeams.stream()
+                .map(TeamSummaryResponseDto::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 특정 사용자가 작성한 게시글 목록 조회
+     */
+    /**
+     * 특정 사용자가 작성한 게시글 목록 조회 (수정된 버전)
+     */
+    @Transactional(readOnly = true)
+    public List<RecruitPostResponseDto> getUserPosts(Long userId) {
+        List<RecruitPost> posts = recruitPostRepository.findByAuthorIdOrderByCreatedAtDesc(userId);
+
+        // ▼▼▼ 복사해온 convertToDto 메소드를 사용하도록 수정합니다. ▼▼▼
+        return posts.stream()
+                .map(this::convertToDto) // this::convertToDto 로 변경
+                .collect(Collectors.toList());
+    }
+
+    // ▼▼▼ RecruitPostService에서 복사해온 convertToDto 메소드 ▼▼▼
+    private RecruitPostResponseDto convertToDto(RecruitPost recruitPost) {
+        Long authorId = null;
+        String authorName = null;
+        if (recruitPost.getAuthor() != null) {
+            authorId = recruitPost.getAuthor().getId();
+            authorName = recruitPost.getAuthor().getName();
+        }
+
+        return RecruitPostResponseDto.builder()
+                .id(recruitPost.getId())
+                .title(recruitPost.getTitle())
+                .content(recruitPost.getContent())
+                .region(recruitPost.getRegion())
+                .subRegion(recruitPost.getSubRegion())
+                .thumbnailUrl(recruitPost.getThumbnailUrl())
+                .category(recruitPost.getCategory()) // ◀ 이 필드가 중요합니다.
+                .targetType(recruitPost.getTargetType())
+                .fromParticipant(recruitPost.getFromParticipant())
+                .toParticipant(recruitPost.getToParticipant())
+                .gameDate(recruitPost.getGameDate())
+                .gameTime(recruitPost.getGameTime())
+                .status(recruitPost.getStatus())
+                .requiredPersonnel(recruitPost.getRequiredPersonnel())
+                .ageGroup(recruitPost.getAgeGroup())
+                .preferredPositions(recruitPost.getPreferredPositions())
+                .matchRules(recruitPost.getMatchRules())
+                .minPlayers(recruitPost.getMinPlayers())
+                .maxPlayers(recruitPost.getMaxPlayers())
+                .authorId(authorId)
+                .authorName(authorName)
+                .createdAt(recruitPost.getCreatedAt())
+                .updatedAt(recruitPost.getUpdatedAt())
+                .build();
     }
 }

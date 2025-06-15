@@ -66,4 +66,5 @@ public interface RecruitPostRepository extends JpaRepository<RecruitPost, Long> 
     // 만약 Optional<RecruitPost>를 반환하고 그 안의 author 필드에 접근할 예정이라면 @EntityGraph를 추가해야 합니다.
     // 여기서는 ID만으로 존재 여부 확인으로 간주하여 @EntityGraph를 붙이지 않습니다.
     Optional<RecruitPost> findByAuthorId(Long authorId);
+    List<RecruitPost> findByAuthorIdOrderByCreatedAtDesc(Long authorId);
 }

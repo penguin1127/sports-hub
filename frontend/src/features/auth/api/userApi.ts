@@ -2,11 +2,13 @@
 
 import axiosInstance from "@/lib/axiosInstance";
 import type { User, UserProfileUpdateDto, PublicUserProfileResponseDto } from "@/types/user"; // UserProfileUpdateDto 및 PublicUserProfileResponseDto 추가
+import type { TeamSummary } from "@/types/team";
+import { PostType } from "@/types/recruitPost";
 
 const API_USERS_BASE_URL = "/api/users";
 
 /**
- * 🔐 내 정보 조회 API (/me)
+ *  내 정보 조회 API (/me)
  */
 export const getMyProfileApi = async (): Promise<User> => {
   const response = await axiosInstance.get<User>(`${API_USERS_BASE_URL}/me`);
@@ -14,7 +16,7 @@ export const getMyProfileApi = async (): Promise<User> => {
 };
 
 /**
- * ⚙️ 내 정보 수정 API
+ *  내 정보 수정 API
  * @param updatedData 변경할 유저 정보
  */
 export const updateMyProfileApi = async (updatedData: Partial<UserProfileUpdateDto>): Promise<User> => {
@@ -24,7 +26,7 @@ export const updateMyProfileApi = async (updatedData: Partial<UserProfileUpdateD
 };
 
 /**
- * 🙋‍♂️ 특정 사용자의 공개 프로필 정보 조회 API
+ *  특정 사용자의 공개 프로필 정보 조회 API
  * @param userId 조회할 사용자의 ID
  */
 export const fetchPublicUserProfileApi = async (userId: number | string): Promise<PublicUserProfileResponseDto> => {
@@ -35,6 +37,34 @@ export const fetchPublicUserProfileApi = async (userId: number | string): Promis
     return response.data;
   } catch (error) {
     console.error(`[userApi] Error fetching public user profile for ID ${userId}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * 특정 사용자의 소속팀 목록 조회 API
+ * @param userId 조회할 사용자의 ID
+ */
+export const getUserTeamsApi = async (userId: number | string): Promise<TeamSummary[]> => {
+  try {
+    const response = await axiosInstance.get<TeamSummary[]>(`/api/users/${userId}/teams`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching teams for user ID ${userId}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * 특정 사용자의 작성글 목록 조회 API
+ * @param userId 조회할 사용자의 ID
+ */
+export const getUserPostsApi = async (userId: number | string): Promise<PostType[]> => {
+  try {
+    const response = await axiosInstance.get<PostType[]>(`/api/users/${userId}/posts`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching posts for user ID ${userId}:`, error);
     throw error;
   }
 };
