@@ -1,4 +1,5 @@
 // src/types/application.ts
+
 import { ApplicationStatus } from "./recruitPost"; // RecruitStatus와 동일한 Enum을 쓴다고 가정
 
 // 백엔드의 ApplicationResponseDto와 일치하는 타입
