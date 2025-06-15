@@ -110,4 +110,10 @@ public class RecruitPost {
     // 양방향 연관관계: 이 게시글에 대한 Application 목록
     @OneToMany(mappedBy = "recruitPost", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Application> applications = new ArrayList<>();
+
+    // ▼▼▼ 이 편의 메소드를 추가합니다. ▼▼▼
+    public void addApplication(Application application) {
+        this.applications.add(application);
+        application.setRecruitPost(this); // Application 객체에도 RecruitPost를 설정 (양방향)
+    }
 }

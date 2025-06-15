@@ -54,4 +54,7 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
 
     // 특정 게시글에 들어온 모든 신청 내역을 조회하는 메소드 (나중에 게시글 주인이 확인하는 용도)
     List<Application> findByRecruitPostIdOrderByAppliedAtDesc(Long recruitPostId);
+
+    // '받은 신청' 처리 시 사용 (특정 글의 PENDING 상태인 신청들 조회)
+    List<Application> findByRecruitPostIdAndApplicationStatus(Long recruitPostId, ApplicationStatus status);
 }

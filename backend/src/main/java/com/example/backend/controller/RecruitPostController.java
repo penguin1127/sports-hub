@@ -103,17 +103,4 @@ public class RecruitPostController {
         return ResponseEntity.ok(updatedPost);
     }
 
-    /**
-     * 특정 모집글에 지원 신청
-     */
-    @PostMapping("/{postId}/apply")
-    public ResponseEntity<String> applyToPost(
-            @PathVariable Long postId,
-            @RequestBody ApplicationRequestDto requestDto,
-            @AuthenticationPrincipal UserDetails userDetails) {
-
-        applicationService.createApplication(postId, requestDto, userDetails.getUsername());
-
-        return ResponseEntity.status(HttpStatus.CREATED).body("신청이 성공적으로 완료되었습니다.");
-    }
 }

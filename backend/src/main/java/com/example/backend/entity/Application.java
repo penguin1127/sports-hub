@@ -57,4 +57,7 @@ public class Application {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false) // 상태 업데이트 일시
     private LocalDateTime updatedAt;
+
+    @Column(name = "rejection_reason")
+    private String rejectionReason;
 }
