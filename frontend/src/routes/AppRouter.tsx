@@ -10,13 +10,18 @@ import MatchPage from "@/features/match/pages/MatchPage";
 import LoginPage from "@/features/auth/pages/LoginPage";
 import SignupPage from "@/features/auth/pages/SignupPage";
 import TeamManagementPage from "@/features/team-manage/pages/TeamManagePage";
+
 // ▼▼▼ 사용자님의 파일 이름에 맞춰 임포트 경로와 이름을 수정합니다. ▼▼▼
+
 import MyPageLayout from "@/features/mypage/pages/MyPageLayout";
 import MyProfileInfo from "@/features/mypage/components/MyProfileInfo";
 import UserTeamList from "@/features/mypage/components/UserTeamList"; // UserTeamsList -> UserTeamList
 import MyPost from "@/features/mypage/components/MyPost"; // MyPosts -> MyPost
 
+import MySentApplications from "@/features/mypage/components/MySentApplications";
+
 // TODO: 아래 컴포넌트들은 추후 생성해야 합니다.
+
 const TeamManagePage = () => <div className="p-8 pt-24">팀 관리 페이지</div>;
 const TeamDetailPage = () => <div className="p-8 pt-24">팀 상세 페이지</div>;
 

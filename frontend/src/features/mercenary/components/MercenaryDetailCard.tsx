@@ -149,11 +149,8 @@ const MercenaryDetailCard: React.FC<MercenaryDetailCardProps> = ({ post, isExpan
 
       <div className="mt-6 text-right space-x-2">
         {/* 신청하기 버튼 */}
-        {user && user.id !== post.authorId && post.status === RecruitStatus.RECRUITING && (
-          <button 
-            onClick={(e) => { e.stopPropagation(); handleApply(); }}
-            className="bg-green-500 hover:bg-green-600 text-white text-sm px-4 py-2 rounded"
-          >
+        {user && user.id !== post.authorId && post.status === 'RECRUITING' && (
+          <button onClick={(e) => { e.stopPropagation(); handleApply(); }} className="bg-green-500 ...">
             신청하기
           </button>
         )}

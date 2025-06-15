@@ -51,6 +51,12 @@ export enum RecruitStatus {
   CANCELLED = "CANCELLED",     // 백엔드 Enum에 정의되어 있다면
 }
 
+export enum ApplicationStatus {
+  PENDING = 'PENDING',
+  ACCEPTED = 'ACCEPTED',
+  REJECTED = 'REJECTED',
+}
+
 /**
  * 게시글 생성 요청 시 서버로 전송할 데이터 타입.
  * 백엔드 RecruitPostCreationRequest.java 와 필드 구조 및 타입을 일치시킵니다.
