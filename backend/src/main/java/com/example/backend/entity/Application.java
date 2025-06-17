@@ -60,4 +60,5 @@ public class Application {
 
     @Column(name = "rejection_reason")
     private String rejectionReason;
+
 }

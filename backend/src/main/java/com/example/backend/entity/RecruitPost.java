@@ -56,7 +56,8 @@ public class RecruitPost {
 
     @Enumerated(EnumType.STRING)
     @Column(length = 50, nullable = false)
-    private RecruitCategory category;
+
+    private RecruitCategory category; // 용병 모집인지 팀 모집인지 경기 모집인지를 결정하는 카테고리
 
     @Enumerated(EnumType.STRING)
     @Column(name = "target_type", length = 50, nullable = false)
