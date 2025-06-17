@@ -7,6 +7,8 @@ import com.example.backend.entity.User;         // 신청자 User import
 import com.example.backend.entity.Team;         // 신청 팀 import
 import com.example.backend.enums.ApplicationStatus; // 신청 상태 ENUM import
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -57,4 +59,8 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
 
     // '받은 신청' 처리 시 사용 (특정 글의 PENDING 상태인 신청들 조회)
     List<Application> findByRecruitPostIdAndApplicationStatus(Long recruitPostId, ApplicationStatus status);
+
+    // JPQL을 사용하여 작성자 ID로 신청 목록을 찾는 메소드 추가
+    @Query("SELECT a FROM Application a WHERE a.recruitPost.author.id = :authorId ORDER BY a.appliedAt DESC")
+    List<Application> findApplicationsByPostAuthorId(@Param("authorId") Long authorId);
 }

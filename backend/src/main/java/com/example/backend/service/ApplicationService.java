@@ -2,6 +2,7 @@ package com.example.backend.service;
 
 import com.example.backend.dto.application.ApplicationRequestDto;
 import com.example.backend.dto.application.ApplicationResponseDto;
+import com.example.backend.dto.application.ReceivedApplicationResponseDto;
 import com.example.backend.entity.*;
 import com.example.backend.enums.ApplicationStatus;
 import com.example.backend.enums.RecruitCategory;
@@ -122,5 +123,20 @@ public class ApplicationService {
 
         applicationRepository.delete(application);
         // TODO: 알림 기능 - 게시글 작성자에게 "B님이 신청을 취소했습니다" 알림 전송
+    }
+
+    /**
+     * 특정 사용자가 받은 모든 신청 내역 조회
+     */
+    @Transactional(readOnly = true)
+    public List<ReceivedApplicationResponseDto> getReceivedApplications(String loginId) {
+        User user = userRepository.findByUserid(loginId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        List<Application> applications = applicationRepository.findApplicationsByPostAuthorId(user.getId());
+
+        return applications.stream()
+                .map(ReceivedApplicationResponseDto::fromEntity)
+                .collect(Collectors.toList());
     }
 }
