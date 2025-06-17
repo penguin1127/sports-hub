@@ -2,6 +2,7 @@ package com.example.backend.controller;
 
 import com.example.backend.dto.application.ApplicationRequestDto;
 import com.example.backend.dto.application.ApplicationResponseDto;
+import com.example.backend.dto.application.ReceivedApplicationResponseDto;
 import com.example.backend.service.ApplicationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -54,5 +55,12 @@ public class ApplicationController {
     public ResponseEntity<Void> cancelApplication(@PathVariable Long applicationId, @AuthenticationPrincipal UserDetails userDetails) {
         applicationService.cancelApplication(applicationId, userDetails.getUsername());
         return ResponseEntity.noContent().build();
+    }
+
+    //내가 받은 신청 내역 목록 조회
+    @GetMapping("/received")
+    public ResponseEntity<List<ReceivedApplicationResponseDto>> getMyReceivedApplications(@AuthenticationPrincipal UserDetails userDetails) {
+        List<ReceivedApplicationResponseDto> receivedApplications = applicationService.getReceivedApplications(userDetails.getUsername());
+        return ResponseEntity.ok(receivedApplications);
     }
 }
