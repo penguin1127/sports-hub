@@ -14,8 +14,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"captain", "userTeams", "recruitPosts", "applications"}) // 양방향 연관관계 필드 제외
-@EqualsAndHashCode(exclude = {"captain", "userTeams", "recruitPosts", "applications"}) // 양방향 연관관계 필드 제외
+@ToString(exclude = {"captain", "userTeams", "recruitPosts", "applications","teamPosts"}) // 양방향 연관관계 필드 제외
+@EqualsAndHashCode(exclude = {"captain", "userTeams", "recruitPosts", "applications","teamPosts"}) // 양방향 연관관계 필드 제외
 public class Team {
 
     @Id
@@ -64,6 +64,13 @@ public class Team {
     // 양방향 연관관계: 이 팀이 신청한 Application 목록
     @OneToMany(mappedBy = "applicantTeam", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Application> applications = new ArrayList<>();
+
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TeamAnnouncement> announcements = new ArrayList<>();
+
+    // 양방향 연관관계: 이 팀이 게시한 TeamPost 목록
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TeamPost> teamPosts = new ArrayList<>();
 
     // 편의 메소드 (UserTeam 관계 설정 등)
     public void addMember(UserTeam userTeam) {

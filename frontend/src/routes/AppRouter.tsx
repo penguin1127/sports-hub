@@ -44,7 +44,7 @@ const AppRouter = () => {
           <Route path="/match" element={<MatchPage />} />
           
           {/* 팀 상세 정보 페이지 (Public) */}
-          <Route path="/teams/:id" element={<TeamDetailPage />} />
+          <Route path="/team-manage/:id" element={<TeamDetailPage />} />
 
           {/* 팀 관리 페이지 (로그인 필요) */}
           <Route path="/team-manage" element={<TeamManagePage />} />

@@ -13,7 +13,7 @@ export interface Team {
   homeGround: string | null;
   createdAt: string;
   updatedAt: string;
-  // TODO: 필요하다면 팀 멤버 목록 등 추가 정보 포함 가능
+  myRoleInTeam: 'CAPTAIN' | 'MEMBER' | null;
 }
 
 // 팀 목록 등에서 간단히 사용할 타입
@@ -22,5 +22,41 @@ export interface TeamSummary {
   name: string;
   logoUrl: string | null;
   region: string;
-  roleInTeam: string; // "CAPTAIN", "MEMBER" 등
+  roleInTeam: string;
+}
+
+// 팀원 정보를 위한 타입
+export interface TeamMember {
+  userId: number;
+  userName: string;
+  userLoginId: string;
+  roleInTeam: string;
+}
+
+// 팀 공지사항을 위한 타입
+export interface TeamAnnouncement {
+  id: number;
+  title: string;
+  content: string;
+  createdAt: string;
+}
+
+// 팀 게시글을 위한 타입 (좋아요 정보 포함)
+export interface TeamPost {
+  id: number;
+  title: string;
+  content: string;
+  authorName: string; 
+  createdAt: string;
+  likeCount: number;
+  isLikedByCurrentUser: boolean;
+}
+
+// 댓글을 위한 타입
+export interface PostComment {
+  id: number;
+  content: string;
+  authorId: number;
+  authorName: string;
+  createdAt: string;
 }

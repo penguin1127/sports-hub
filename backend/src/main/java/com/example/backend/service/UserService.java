@@ -74,10 +74,9 @@ public class UserService {
 
     // 3. 사용자 정보 조회 (by id - 상세 정보)
     // 이 메소드는 본인 또는 관리자만 접근 가능하도록 추후 권한 설정 필요
-    public UserResponseDto getUserProfile(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("사용자를 찾을 수 없습니다. ID: " + id));
-        return UserResponseDto.fromEntity(user);
+    public User findUserByLoginId (String id) {
+        return userRepository.findByUserid(id)
+                .orElseThrow(() -> new ResourceNotFoundException("사용자를 찾을 수 없습니다: " + id));
     }
 
     //  3-1. 다른 사용자의 공개 프로필 정보 조회 (by id)

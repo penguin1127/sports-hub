@@ -9,6 +9,10 @@ import type { TeamSummary } from '@/types/team';
 // ▼▼▼ 이제 userId prop은 필요 없습니다.
 interface UserTeamsListProps {}
 
+interface Props {
+  userId: string;
+}
+
 const UserTeamsList: React.FC<UserTeamsListProps> = () => {
   const { user } = useAuthStore(); // ▼▼▼ Zustand 스토어에서 로그인한 사용자 정보를 가져옵니다.
 

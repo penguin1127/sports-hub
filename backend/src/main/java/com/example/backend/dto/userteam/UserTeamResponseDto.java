@@ -1,6 +1,7 @@
 // src/main/java/com/example/backend/dto/userteam/UserTeamResponseDto.java
 package com.example.backend.dto.userteam;
 
+import com.example.backend.entity.Team;
 import com.example.backend.entity.UserTeam;
 import com.example.backend.dto.user.UserResponseDto; // 사용자 정보 DTO
 import com.example.backend.dto.team.TeamResponseDto; // 팀 정보 DTO
@@ -29,13 +30,29 @@ public class UserTeamResponseDto {
     private Boolean isActive;
     private String roleInTeam;
 
-    // 엔티티를 DTO로 변환하는 정적 팩토리 메서드
     public static UserTeamResponseDto fromEntity(UserTeam userTeam) {
+        Team teamEntity = userTeam.getTeam();
+
+        // 1. 중첩된 TeamResponseDto를 먼저 생성합니다.
+        //    이때 myRoleInTeam은 이 DTO의 컨텍스트에서는 알 수 없으므로 null로 설정합니다.
+        TeamResponseDto teamDto = TeamResponseDto.builder()
+                .id(teamEntity.getId())
+                .name(teamEntity.getName())
+                .region(teamEntity.getRegion())
+                .subRegion(teamEntity.getSubRegion())
+                .description(teamEntity.getDescription())
+                .captainName(teamEntity.getCaptain().getName())
+                .logoUrl(teamEntity.getLogoUrl())
+                .homeGround(teamEntity.getHomeGround())
+                .createdAt(teamEntity.getCreatedAt())
+                .updatedAt(teamEntity.getUpdatedAt())
+                .myRoleInTeam(null) // 여기서는 역할을 알 수 없으므로 null 처리
+                .build();
+
+        // 2. 완성된 teamDto를 사용하여 최종 UserTeamResponseDto를 생성합니다.
         return UserTeamResponseDto.builder()
                 .userId(userTeam.getUser().getId())
-                .teamId(userTeam.getTeam().getId())
-                .user(UserResponseDto.fromEntity(userTeam.getUser()))
-                .team(TeamResponseDto.fromEntity(userTeam.getTeam()))
+                .team(teamDto)
                 .joinedAt(userTeam.getJoinedAt())
                 .isActive(userTeam.getIsActive())
                 .roleInTeam(userTeam.getRoleInTeam())

@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 // 경기를 담당하는 테이블
-@Table(name = "match")
+@Table(name = "matches")
 @Entity
 public class Match {
     @Id

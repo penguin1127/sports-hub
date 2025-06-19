@@ -1,35 +1,56 @@
-import { useNavigate } from "react-router-dom"
+// src/features/team-manage/components/TeamMemberList.tsx
 
-type Props = {
-  id: number
-  name: string
-  intro: string
-  region: string
-  imageUrl: string
+import React, { useEffect, useState } from 'react';
+import { getTeamMembersApi } from '@/features/team/api/teamApi';
+import type { TeamMember } from '@/types/team';
+
+interface Props {
+  teamId: string;
 }
 
-const TeamListItem = ({ id, name, intro, region, imageUrl }: Props) => {
-  const navigate = useNavigate()
+const TeamMemberList: React.FC<Props> = ({ teamId }) => {
+  const [members, setMembers] = useState<TeamMember[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        setIsLoading(true);
+        const data = await getTeamMembersApi(teamId);
+        setMembers(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchMembers();
+  }, [teamId]);
+
+  if (isLoading) return <div className="p-6 text-center">팀원 목록을 불러오는 중...</div>;
 
   return (
-    <div
-      onClick={() => navigate(`/team/${id}`)}
-      className="flex items-center gap-8 px-8 py-6 border-b hover:bg-gray-100 cursor-pointer"
-    >
-      {/* 훨씬 큰 썸네일 */}
-      <img
-        src={imageUrl}
-        alt={name}
-        className="w-24 h-24 rounded-xl object-cover"
-      />
-
-      <div className="flex-1 min-w-0">
-        <h3 className="text-2xl font-bold text-gray-900 truncate">{name}</h3>
-        <p className="text-lg text-gray-700 mt-2 truncate">{intro}</p>
-        <span className="text-base text-gray-500">{region}</span>
-      </div>
+    <div className="p-6 bg-white shadow-md rounded-lg">
+      <h2 className="text-2xl font-semibold mb-4">👥 팀원 관리</h2>
+      <ul className="divide-y divide-gray-200">
+        {members.map(member => (
+          <li key={member.userId} className="py-4 flex justify-between items-center">
+            <div>
+              <p className="font-semibold text-lg">{member.userName}</p>
+              <p className="text-gray-500 text-sm">{member.userLoginId}</p>
+            </div>
+            <span className={`px-3 py-1 text-sm font-semibold rounded-full ${
+              member.roleInTeam === 'CAPTAIN' 
+                ? 'bg-red-100 text-red-800' 
+                : 'bg-gray-100 text-gray-800'
+            }`}>
+              {member.roleInTeam === 'CAPTAIN' ? '주장' : '팀원'}
+            </span>
+          </li>
+        ))}
+      </ul>
     </div>
-  )
-}
+  );
+};
 
-export default TeamListItem
+export default TeamMemberList;

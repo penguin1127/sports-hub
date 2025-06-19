@@ -23,25 +23,13 @@ public class TeamResponseDto {
     private Long id;
     private String name;
     private String region;
+    private String subRegion;
     private String description;
-    private UserResponseDto captain; // ✅ 필드명 변경: creatorUser -> captain
-    private String logoUrl; // ✅ 추가된 필드
-    private String homeGround; // ✅ 추가된 필드
+    private String captainName;
+    private String logoUrl;
+    private String homeGround;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private String myRoleInTeam; // 내가 이 팀에서 맡은 역할
 
-    // 엔티티를 DTO로 변환하는 정적 팩토리 메서드
-    public static TeamResponseDto fromEntity(Team team) {
-        return TeamResponseDto.builder()
-                .id(team.getId())
-                .name(team.getName())
-                .region(team.getRegion())
-                .description(team.getDescription())
-                .captain(UserResponseDto.fromEntity(team.getCaptain())) // ✅ getCreatorUser() -> getCaptain()
-                .logoUrl(team.getLogoUrl()) // ✅ 추가
-                .homeGround(team.getHomeGround()) // ✅ 추가
-                .createdAt(team.getCreatedAt())
-                .updatedAt(team.getUpdatedAt())
-                .build();
-    }
 }
