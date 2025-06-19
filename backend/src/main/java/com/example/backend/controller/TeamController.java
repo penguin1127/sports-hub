@@ -29,7 +29,8 @@ public class TeamController {
     public ResponseEntity<TeamResponseDto> createTeam(
             @RequestBody @Valid TeamCreateRequestDto createRequestDto,
             @AuthenticationPrincipal UserDetails userDetails) { // 현재 로그인한 사용자 정보 (주장이 됨)
-        Long currentUserId = Long.valueOf(userDetails.getUsername()); // String userId를 Long으로 변환 가정
+        // userDetails.getUsername()은 로그인 ID (예: "test1234")를 반환합니다.
+        String currentUserId = userDetails.getUsername();
 
         TeamResponseDto newTeam = teamService.createTeam(createRequestDto, currentUserId);
         return ResponseEntity.status(HttpStatus.CREATED).body(newTeam);
