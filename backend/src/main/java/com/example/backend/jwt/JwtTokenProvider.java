@@ -30,6 +30,14 @@ public class JwtTokenProvider {
 
     private Key signingKey;
 
+    public void setSecretKey(String secretKey) {
+        this.secretKey = secretKey;
+    }
+
+    public void setTokenValidityInMs(long tokenValidityInMs) {
+        this.tokenValidityInMs = tokenValidityInMs;
+    }
+
     @PostConstruct
     protected void init() {
         byte[] keyBytes = Base64.getEncoder().encode(secretKey.getBytes());

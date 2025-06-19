@@ -62,6 +62,7 @@ public class WebSecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 사용 안 함
                 .authorizeHttpRequests(auth -> auth
                         // 인증 없이 접근 허용하는 경로
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll() // 회원가입, 로그인 등 인증 관련 API
                         .requestMatchers("/api/users/check-email").permitAll() // 이메일 중복 체크
                         .requestMatchers("/api/users/check-userid").permitAll() // 사용자 ID 중복 체크

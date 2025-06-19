@@ -37,8 +37,8 @@ public class TeamService {
     private final UserTeamRepository userTeamRepository;
 
     // 1. 팀 생성
-    public TeamResponseDto createTeam(TeamCreateRequestDto createDto, Long captainUserId) {
-        User captainUser = userRepository.findById(captainUserId)
+    public TeamResponseDto createTeam(TeamCreateRequestDto createDto, String captainLoginId) { // ◀ 파라미터 타입을 String으로 변경
+        User captainUser = userRepository.findByUserid(captainLoginId) // ◀ findByUserid 사용
                 .orElseThrow(() -> new ResourceNotFoundException("팀 주장(사용자)을 찾을 수 없습니다."));
 
         Team team = Team.builder()
@@ -54,12 +54,12 @@ public class TeamService {
 
         // 팀 생성 시, 주장(captain)을 UserTeam 관계에 리더 역할로 추가
         UserTeam userTeam = UserTeam.builder()
-                .id(new UserTeamId(captainUser.getId(), savedTeam.getId())) // ✅ UserTeamId 인스턴스 생성 및 할당
+                .id(new UserTeamId(captainUser.getId(), savedTeam.getId()))
                 .user(captainUser)
                 .team(savedTeam)
                 .joinedAt(LocalDateTime.now())
                 .isActive(true)
-                .roleInTeam("LEADER")
+                .roleInTeam("CAPTAIN") // 주장은 CAPTAIN 역할로 지정
                 .build();
         userTeamRepository.save(userTeam);
 

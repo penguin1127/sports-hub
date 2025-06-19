@@ -13,6 +13,29 @@ export interface MyApplication {
   postTitle: string;
 }
 
+// '받은 신청' 목록용 타입 (신청자 정보 포함)
+export interface ReceivedApplication {
+  applicationId: number;
+  status: ApplicationStatus;
+  message: string;
+  appliedAt: string;
+  postId: number;
+  postTitle: string;
+  applicantId: number;
+  applicantName: string;
+}
+
+export interface ReceivedApplication {
+  applicationId: number;
+  status: ApplicationStatus;
+  message: string;
+  appliedAt: string;
+  postId: number;
+  postTitle: string;
+  applicantId: number;
+  applicantName: string;
+}
+
 export interface ApplicationRequestDto {
   message?: string;
   applicantTeamId?: number;
