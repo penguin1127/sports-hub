@@ -28,9 +28,11 @@ public class Notification {
 
     // 하나의 detail 과의 양방향 관계, cascade = CascadeType.ALL 의미: 부모 엔티티를 조작할 때 자식 엔티티도 함께 조작함.(db에 저장, 삭제 등)
     // 부모: Notification, 자식: NotificationDetail
-    @OneToOne(cascade = CascadeType.ALL)
+
+    /*
+    @OneToOne(mappedBy = "notificationID", cascade = CascadeType.ALL)
     @JoinColumn(name = "notification_detail_id", nullable = false)
-    private NotificationDetail detail;
+    private NotificationDetail detail;*/
 
     @Enumerated(EnumType.STRING)
     @Column(length = 50)
@@ -49,3 +51,4 @@ public class Notification {
     @Column(name = "created_at")
     private LocalDateTime createdAt; // 알림 도착 시간
 }
+

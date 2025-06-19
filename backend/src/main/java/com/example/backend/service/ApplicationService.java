@@ -25,7 +25,7 @@ public class ApplicationService {
     private final RecruitPostRepository recruitPostRepository;
     private final TeamRepository teamRepository;
     private final UserTeamRepository userTeamRepository;
-    // private final NotificationService notificationService; // 알림 기능 구현 시 주석 해제
+    private final NotificationService notificationService; // 알림 기능 구현 시 주석 해제
 
     @Transactional
     public Application createApplication(Long postId, ApplicationRequestDto requestDto, String applicantLoginId) {
@@ -63,8 +63,7 @@ public class ApplicationService {
         Application savedApplication = applicationRepository.save(newApplication);
 
         // TODO: 알림 기능 구현 시 여기에 알림 전송 로직 추가
-        // notificationService.notifyApplication(recruitPost.getAuthor(), savedApplication);
-
+        notificationService.notifyApplication(recruitPost.getId(), savedApplication.getId(), recruitPost.getAuthor());
         return savedApplication;
     }
 
@@ -73,16 +72,6 @@ public class ApplicationService {
         User user = userRepository.findByUserid(loginId).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
         List<Application> applications = applicationRepository.findByApplicantIdOrderByAppliedAtDesc(user.getId());
         return applications.stream().map(ApplicationResponseDto::fromEntity).collect(Collectors.toList());
-    }
-
-    @Transactional(readOnly = true)
-    public List<ReceivedApplicationResponseDto> getReceivedApplications(String loginId) {
-        User user = userRepository.findByUserid(loginId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-        List<Application> applications = applicationRepository.findApplicationsByPostAuthorId(user.getId());
-        return applications.stream()
-                .map(ReceivedApplicationResponseDto::fromEntity)
-                .collect(Collectors.toList());
     }
 
     @Transactional

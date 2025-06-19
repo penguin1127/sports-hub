@@ -58,11 +58,4 @@ public class ApplicationController {
         applicationService.cancelApplication(applicationId, userDetails.getUsername());
         return ResponseEntity.noContent().build();
     }
-
-    //내가 받은 신청 내역 목록 조회
-    @GetMapping("/received")
-    public ResponseEntity<List<ReceivedApplicationResponseDto>> getMyReceivedApplications(@AuthenticationPrincipal UserDetails userDetails) {
-        List<ReceivedApplicationResponseDto> receivedApplications = applicationService.getReceivedApplications(userDetails.getUsername());
-        return ResponseEntity.ok(receivedApplications);
-    }
 }

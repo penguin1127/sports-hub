@@ -20,7 +20,8 @@ public class NotificationDetail {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(mappedBy = "detail") // 하나의 notfication 과의 역방향 관계
+    @OneToOne
+    @JoinColumn(name = "notification_id", nullable = false)
     private Notification notificationID;
 
     @Column(name = "target_id")

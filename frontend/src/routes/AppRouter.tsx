@@ -25,6 +25,7 @@ import MyProfileInfo from "@/features/mypage/components/MyProfileInfo";
 import UserTeamList from "@/features/mypage/components/UserTeamList";
 import MyPost from "@/features/mypage/components/MyPost";
 import MyApplicationPage from "@/features/mypage/components/MyApplicationPage";
+import MercenaryApplyPage from "@/features/mercenary/pages/MercenaryApplyPage.tsx";
 
 // Fallback Page
 const NotFound = () => <div className="text-xl p-8 pt-24">404 | Page Not Found</div>;
@@ -40,6 +41,7 @@ const AppRouter = () => {
           
           {/* 모집 관련 페이지 */}
           <Route path="/mercenary" element={<MercenaryPage />} />
+          <Route path="/mercenary/apply/:id" element={<MercenaryApplyPage />} /> {/* 추가 */}
           <Route path="/team" element={<TeamPage />} />
           <Route path="/match" element={<MatchPage />} />
           

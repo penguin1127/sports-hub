@@ -6,6 +6,7 @@ import { RecruitStatus } from "@/types/recruitPost";
 import { useAuthStore } from '@/stores/useAuthStore';
 import { applyToPostApi } from '../api/recruitApi';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; // 추가
 
 interface MercenaryDetailCardProps {
   post: PostType;
@@ -44,7 +45,7 @@ const getStatusDisplayForDetail = (statusValue: PostType["status"]): React.React
 
 const MercenaryDetailCard: React.FC<MercenaryDetailCardProps> = ({ post, isExpanded, onClose, onExpand, onEdit, onDelete, onAuthorNameClick }) => {
   const { user } = useAuthStore();
-
+  const navigate = useNavigate(); // 라우팅에 사용
   const isTeamToIndividual = post.fromParticipant === 'TEAM';
   const flowLabel = isTeamToIndividual ? "팀 → 개인" : "개인 → 팀";
   const dateLabel = isTeamToIndividual ? '경기 날짜' : '활동 가능 날짜';
@@ -54,6 +55,11 @@ const MercenaryDetailCard: React.FC<MercenaryDetailCardProps> = ({ post, isExpan
   const formattedDate = post.gameDate ? post.gameDate.toString().split("T")[0] : "날짜 미정";
   const formattedTime = post.gameTime || "시간 미정";
 
+  // ✅ 수정된 부분
+  const handleApply = () => {
+    navigate(`/mercenary/apply/${post.id}`); // 신청 페이지로 이동
+  };
+  /*
   const handleApply = async () => {
     const message = prompt("작성자에게 전달할 간단한 메시지를 입력하세요 (선택사항):");
     if (message === null) return;
@@ -68,7 +74,7 @@ const MercenaryDetailCard: React.FC<MercenaryDetailCardProps> = ({ post, isExpan
         alert("알 수 없는 오류가 발생했습니다.");
       }
     }
-  };
+  }; */
 
   // 요약 카드 (펼치기 전)
   if (!isExpanded) {
