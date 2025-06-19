@@ -40,7 +40,7 @@ public class ReceivedApplicationResponseDto {
     public static ReceivedApplicationResponseDto fromEntity(Application application) {
         return ReceivedApplicationResponseDto.builder()
                 .applicationId(application.getId())
-                .status(application.getApplicationStatus())
+                .status(application.getStatus())
                 .message(application.getMessage())
                 .appliedAt(application.getAppliedAt())
                 .postId(application.getRecruitPost().getId())

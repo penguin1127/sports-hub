@@ -32,7 +32,7 @@ public class ApplicationResponseDto {
     public static ApplicationResponseDto fromEntity(Application application) {
         return ApplicationResponseDto.builder()
                 .applicationId(application.getId())
-                .status(application.getApplicationStatus())
+                .status(application.getStatus())
                 .message(application.getMessage())
                 .rejectionReason(application.getRejectionReason())
                 .appliedAt(application.getAppliedAt())
