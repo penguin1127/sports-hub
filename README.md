@@ -1,4 +1,4 @@
-우리의 상황 
+우리의 상황\n 
 ![image](https://github.com/user-attachments/assets/84c1f387-bca6-43aa-9bb5-d3ee454e42cc)
 
 현재 개발중인 기능 및 추가중인 기능
