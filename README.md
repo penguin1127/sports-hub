@@ -1,5 +1,4 @@
 ![image](https://github.com/user-attachments/assets/84c1f387-bca6-43aa-9bb5-d3ee454e42cc)
-![image](https://github.com/user-attachments/assets/987dc342-100f-43d3-9365-e72810ae7a69)
 
 우리의 상황 
 
