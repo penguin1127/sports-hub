@@ -1,6 +1,5 @@
-![image](https://github.com/user-attachments/assets/84c1f387-bca6-43aa-9bb5-d3ee454e42cc)
-
 우리의 상황 
+![image](https://github.com/user-attachments/assets/84c1f387-bca6-43aa-9bb5-d3ee454e42cc)
 
 현재 개발중인 기능 및 추가중인 기능
 각 사이트에 대해 DB연결, 마이페이지 상세 설정, 팀 상세페이지(사실상 얘네가 대부분)
